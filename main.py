@@ -438,14 +438,14 @@ if __name__ == '__main__':
         slide_chunks = create_chunks(slide_texts)
         slide_topics = extract_topics(slide_chunks)
         # st.title("Knowledge Tree")
-        # st.write(slide_topics)
+        st.write(slide_topics)
         slide_topics_structured = structure_topics(slide_topics)
         # st.write(slide_topics_structured)
 
         if book_upload is not None:
             book_vectors = embed_book(book_upload)
             slide_topics_expanded = expand_topics(slide_topics_structured, book_vectors)
-            # st.write(slide_topics_expanded)
+            st.write(slide_topics_expanded)
             flashcards = generate_flashcards(slide_topics_structured, slide_topics_expanded)
             flashcards_questions = flashcards[0]
             flashcards_answers = flashcards[1]
