@@ -15,8 +15,9 @@ from langchain.vectorstores import FAISS
 from langchain.chains import RetrievalQA
 
 
-load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY")
+# load_dotenv()
+# openai.api_key = os.getenv("OPENAI_API_KEY")
+openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 st.title("Learnloop")
 """
