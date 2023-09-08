@@ -286,11 +286,11 @@ if __name__ == '__main__':
                 st.session_state.previous_pdf_name = current_pdf_name
 
         slide_texts = pdf_reader(slide_upload)
-        st.write(slide_texts)
+        # st.write(slide_texts)
         slide_chunks = create_chunks(slide_texts)
         # st.write(f"slide_chunks: {slide_chunks}")
         slide_topics = extract_topics(slide_chunks)
-        st.write(f"slide_topics: {slide_topics}")
+        # st.write(f"slide_topics: {slide_topics}")
         # slide_topics_structured = structure_topics(slide_topics)
         topic_list = clean_topics(slide_topics)
         st.write(f"topic_list: {topic_list}")
@@ -309,9 +309,9 @@ if __name__ == '__main__':
                 text_flashcards += f"{flashcard}\n\n"
 
 
-            st.write(flashcards[2])
-            st.write(flashcards_questions)
-            st.write(flashcards_answers)
+            # st.write(flashcards[2])
+            # st.write(flashcards_questions)
+            # st.write(flashcards_answers)
 
             if 'count' not in st.session_state:
                 st.session_state.count = 0
