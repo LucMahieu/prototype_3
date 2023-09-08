@@ -55,7 +55,7 @@ def embed_book(book_upload):
 
 
 def create_chunks(text):
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=400, length_function=len)
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=200, chunk_overlap=40, length_function=len)
     chunks = text_splitter.create_documents([text])
     # st.write(f"The document was divided into {len(chunks)} chunks.")
     return chunks
@@ -338,7 +338,7 @@ if __name__ == '__main__':
 
 
             main_container.write("\n\n" + "\n----------------------\n" + "\n\n")
-            main_container.header(topic_list)
+            main_container.header("Flashcards")
 
             main_container.write(flashcards_questions[st.session_state.count])
             download_flashcards(text_flashcards)
