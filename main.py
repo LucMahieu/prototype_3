@@ -95,87 +95,11 @@ def extract_topics(_chunks):
     #            % EINDE VOORBEELDFORMAT
     #        """
     map_template = """
-               De gegeven tekst is geëxtraheerd uit hoorcollegeslides. Jouw doel is om de onderwerpen en 
-               subonderwerpen te extraheren en organiseren op basis van hun abstractieniveau in een lijst vorm zoals 
-               in het voorbeeld hieronder:
-
-#BEGIN VOORBEELD
-
-Input:
-
-Neuromechanics & Motor control
-(BM41040)
-Lecture 10: Sensory Integration
-25-03-2022
-Winfred Mugge, BioMechanical Engineering
-
-Poll!
-What is your current association with the term
-"Sensory Integration"?
-
-4 |
-
-Challenges in Human Movement Control
-• How do we control our limbs?
-• Sensory Integration!
-Franklin and Wolpert (2011)
-Scott, 2004
-
-5 |
-
-Challenges in Human Movement Control
-• Redundancy
-• 600 muscles controlling 200 joints
-• Noise
-• Sensor and motor noise
-• Delays
-• Neural transportation and processing
-• Uncertainty
-• Incomplete knowledge of environment
-• Nonstationarity
-• Growth, fatigue, and aging
-• Nonlinearity
-• Mapping between muscles vs. endpoint
-And what about
-robot control?
-
-6 |
-
-Redundancy
-• Muscle redundancy
-• More muscles than DoF
-• Kinematic redundancy
-• Multiple paths to same position
-• Postures with same hand position
-• Sensor redundancy
-• Multiple sensors measure same
-variable
-
-7|
-
-output:
-
-Neuromechanics & Motor control
-
->Sensory Integration
->>Challenges in Human Movement Control
->>>Redundancy: 600 muscles controlling 200 joints
->>>Noise: Sensor and motor noise
->>>Delays: Neural transportation and processing
->>>Uncertainty: Incomplete knowledge of environment
->>>Nonstationarity: Growth, fatigue, and aging
->>>Nonlinearity: Mapping between muscles vs. endpoint
->>>>Redundancy
->>>>>Muscle redundancy: more muscles than DoF
->>>>>Kinematic redundancy: 
->>>>>>Multiple paths to same position
->>>>>>Postures with same hand position
->>>>>Sensor redundancy: multiple sensors measure same variable
-
-#EINDE VOORBEELD
-
-input:
-"""
+        Extraheer informatie uit het gegeven hoorcollege om een gedetailleerde, specifieke alomvattende lijst op te 
+        stellen van alle genoemde relevante concepten, ideeën, fenomenen, voorbeelden, begrippen, termen, mechanismes, 
+        systemen, structuren, processen, en alle andere woorden die afkomstig zijn uit het hoorcollege die als leerstof 
+        dienen voor een tentamen voor een student. Het is belangrijk dat deze woorden uit dit hoorcollege komen.
+    """
 
     system_message_map_prompt = SystemMessagePromptTemplate.from_template(map_template)
 
@@ -208,87 +132,11 @@ input:
     #            % EINDE VOORBEELDFORMAT
     #        """
     combine_template = """
-                       De gegeven tekst is geëxtraheerd uit hoorcollegeslides. Jouw doel is om de onderwerpen en 
-                       subonderwerpen te extraheren en organiseren op basis van hun abstractieniveau in een lijst vorm zoals 
-                       in het voorbeeld hieronder:
-
-                        #BEGIN VOORBEELD
-
-                        Input:
-
-                        Neuromechanics & Motor control
-                        (BM41040)
-                        Lecture 10: Sensory Integration
-                        25-03-2022
-                        Winfred Mugge, BioMechanical Engineering
-
-                        Poll!
-                        What is your current association with the term
-                        "Sensory Integration"?
-
-                        4 |
-
-                        Challenges in Human Movement Control
-                        • How do we control our limbs?
-                        • Sensory Integration!
-                        Franklin and Wolpert (2011)
-                        Scott, 2004
-
-                        5 |
-
-                        Challenges in Human Movement Control
-                        • Redundancy
-                        • 600 muscles controlling 200 joints
-                        • Noise
-                        • Sensor and motor noise
-                        • Delays
-                        • Neural transportation and processing
-                        • Uncertainty
-                        • Incomplete knowledge of environment
-                        • Nonstationarity
-                        • Growth, fatigue, and aging
-                        • Nonlinearity
-                        • Mapping between muscles vs. endpoint
-                        And what about
-                        robot control?
-
-                        6 |
-
-                        Redundancy
-                        • Muscle redundancy
-                        • More muscles than DoF
-                        • Kinematic redundancy
-                        • Multiple paths to same position
-                        • Postures with same hand position
-                        • Sensor redundancy
-                        • Multiple sensors measure same
-                        variable
-
-                        7|
-
-                        output:
-
-                        Neuromechanics & Motor control
-
-                        >Sensory Integration
-                        >>Challenges in Human Movement Control
-                        >>>Redundancy: 600 muscles controlling 200 joints
-                        >>>Noise: Sensor and motor noise
-                        >>>Delays: Neural transportation and processing
-                        >>>Uncertainty: Incomplete knowledge of environment
-                        >>>Nonstationarity: Growth, fatigue, and aging
-                        >>>Nonlinearity: Mapping between muscles vs. endpoint
-                        >>>>Redundancy
-                        >>>>>Muscle redundancy: more muscles than DoF
-                        >>>>>Kinematic redundancy: 
-                        >>>>>>Multiple paths to same position
-                        >>>>>>Postures with same hand position
-                        >>>>>Sensor redundancy: multiple sensors measure same variable
-
-                        #EINDE VOORBEELD
-
-                        input:
-                        """
+        Combineer deze stukken tekst met  om een gedetailleerde en uitgebreide lijst op te stellen van
+        alle genoemde relevante concepten, ideeën, fenomenen, voorbeelden, begrippen, termen, mechanismes, systemen, 
+        structuren, processen, en alle andere woorden uit het hoorcollege die als leerstof dienen voor een tentamen 
+        voor een student.
+        """
 
     system_message_combine_prompt = SystemMessagePromptTemplate.from_template(combine_template)
 
@@ -317,18 +165,9 @@ def structure_topics(_topics_found):
                 "topic_naam": {
                     "type": 'string',
                     "description": "onderwerp weergegeven in één of een aantal woorden"
-                },
-                "lijst_nummer": {
-                    "type": 'string',
-                    "description": """nummer van het (sub)onderwerp in de lijst  in één van de volgende formats:
-                    x
-                    x.x
-                    x.x.x
-                    x.x.x.x
-                    """
                 }
             },
-            "required": ["topic_naam", "index"],
+            "required": ["topic_naam"],
         }
         chain = create_extraction_chain(structure, llm3)
         topics_structured = chain.run(_topics_found)
@@ -352,11 +191,11 @@ def expand_topics(_topics_structured, _vector_store):
     chat_prompt = ChatPromptTemplate.from_messages(messages=messages)
 
     expand_chain = RetrievalQA.from_chain_type(llm3, chain_type="stuff", retriever=_vector_store.as_retriever(),
-                                               chain_type_kwargs={'verbose': True, 'prompt': chat_prompt})
+                                               chain_type_kwargs={'verbose': False, 'prompt': chat_prompt})
     expanded_topics = []
 
     for topic in _topics_structured:
-        query = f"""{topic["topic_naam"]}"""
+        query = f"""{topic}"""
         with get_openai_callback() as cb:
             topic_expanded = expand_chain.run(query)
         print(cb)
@@ -369,13 +208,12 @@ def expand_topics(_topics_structured, _vector_store):
 def generate_flashcards(_topics, _topics_expanded):
     flashcard_count = 1
     raw_flashcards = []
-    for topic_en_lijstnummer, topic_context in zip(_topics, _topics_expanded):
+    for topic, topic_context in zip(_topics, _topics_expanded):
         # if flashcard_count > 1:
         #     s = "s"
         # else:
         #     s = ''
         # st.write(f"{flashcard_count} flashcard{s} generated from the {len(_topics)}")
-        topic = f"""{topic_en_lijstnummer["topic_naam"]}"""
         messages = [
             {"role": "system", "content": f"""
                 Creëer 1 vraag en antwoord die specifiek en uitsluitend gaan over {topic} binnen de gegeven context {topic_context} in een flashcard format waarbij je eerst de vraag op de voorkant van de flashcard schrijft, gevolgd door een puntkomma (;) en daarna het antwoord op de vraag aan de achterkant van de flashcard.
@@ -426,6 +264,14 @@ def generate_flashcards(_topics, _topics_expanded):
 def download_flashcards(anki_flashcards):
     st.download_button("Download flashcards", anki_flashcards)
 
+def clean_topics(text):
+    lines = text.split("\n")
+    lines_cleaned = []
+    for line in lines:
+        line.strip()
+        if line != "":
+            lines_cleaned.append(line)
+    return lines_cleaned
 
 if __name__ == '__main__':
     if slide_upload is not None:
@@ -440,18 +286,20 @@ if __name__ == '__main__':
                 st.session_state.previous_pdf_name = current_pdf_name
 
         slide_texts = pdf_reader(slide_upload)
+        st.write(slide_texts)
         slide_chunks = create_chunks(slide_texts)
-        st.write(f"slide_chunks: {slide_chunks}")
+        # st.write(f"slide_chunks: {slide_chunks}")
         slide_topics = extract_topics(slide_chunks)
         st.write(f"slide_topics: {slide_topics}")
-        slide_topics_structured = structure_topics(slide_topics)
-        st.write(f"slide_topics_structured: {slide_topics_structured}")
+        # slide_topics_structured = structure_topics(slide_topics)
+        topic_list = clean_topics(slide_topics)
+        st.write(f"topic_list: {topic_list}")
 
         if book_upload is not None:
             book_vectors = embed_book(book_upload)
-            slide_topics_expanded = expand_topics(slide_topics_structured, book_vectors)
+            slide_topics_expanded = expand_topics(topic_list, book_vectors)
             st.write(f"slide_topics_expanded: {slide_topics_expanded}")
-            flashcards = generate_flashcards(slide_topics_structured, slide_topics_expanded)
+            flashcards = generate_flashcards(topic_list, slide_topics_expanded)
             flashcards_questions = flashcards[0]
             flashcards_answers = flashcards[1]
 
@@ -490,7 +338,7 @@ if __name__ == '__main__':
 
 
             main_container.write("\n\n" + "\n----------------------\n" + "\n\n")
-            main_container.header(slide_topics_structured[0]["topic_naam"])
+            main_container.header(topic_list[0]["topic_naam"])
 
             main_container.write(flashcards_questions[st.session_state.count])
             download_flashcards(text_flashcards)
