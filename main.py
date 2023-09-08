@@ -25,9 +25,10 @@ Met Learnloop kun je de onderwerpen uit hoorcolleges op een effectievere manier 
 onderwerpen uit het hoorcollege haalt, deze aanvult en fact-checked met het boek en over die kennis flashcards maakt.
 
 Stappen:
-1. Upload je slides van een hoorcollege
-2. Upload het boek dat hoort bij het vak
+1. Upload je slides van een hoorcollege.
+2. Upload het boek dat hoort bij het vak.
 3. De slides worden automatisch omgezet tot flashcards. ***De verwerking hiervan kan enkele minuten duren.***
+4. Onderaan de pagina kun je de flashcards downloaden om in ANKI te zetten.
 """
 
 main_container = st.container()
