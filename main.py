@@ -15,9 +15,9 @@ from langchain.vectorstores import FAISS
 from langchain.chains import RetrievalQA
 
 
-# load_dotenv()
-# openai.api_key = os.getenv("OPENAI_API_KEY")
-openai.api_key = st.secrets["OPENAI_API_KEY"]
+load_dotenv()
+openai.api_key = os.getenv("OPENAI_API_KEY")
+# openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 st.title("Learnloop")
 """
@@ -37,7 +37,6 @@ slide_upload = st.file_uploader("Upload hoorcollegeslides", type='pdf')
 book_upload = st.file_uploader("Upload boek", type='pdf')
 llm3 = ChatOpenAI(model_name="gpt-3.5-turbo")
 
-
 def pdf_reader(uploaded_pdf):
     reader = PdfReader(uploaded_pdf)
     text = ""
@@ -51,6 +50,7 @@ def embed_book(book_upload):
     book_text = pdf_reader(book_upload)
     book_chunks = create_chunks(book_text)
     vector_store = embed_chunks(book_chunks)
+    st.write(f"book_chunks: {book_chunks}")
     return vector_store
 
 
@@ -352,7 +352,7 @@ def expand_topics(_topics_structured, _vector_store):
     chat_prompt = ChatPromptTemplate.from_messages(messages=messages)
 
     expand_chain = RetrievalQA.from_chain_type(llm3, chain_type="stuff", retriever=_vector_store.as_retriever(),
-                                               chain_type_kwargs={'verbose': False, 'prompt': chat_prompt})
+                                               chain_type_kwargs={'verbose': True, 'prompt': chat_prompt})
     expanded_topics = []
 
     for topic in _topics_structured:
@@ -368,13 +368,13 @@ def expand_topics(_topics_structured, _vector_store):
 @st.cache_resource
 def generate_flashcards(_topics, _topics_expanded):
     flashcard_count = 1
-    generated_flashcards = []
+    raw_flashcards = []
     for topic_en_lijstnummer, topic_context in zip(_topics, _topics_expanded):
-        if flashcard_count > 1:
-            s = "s"
-        else:
-            s = ''
-        st.write(f"{flashcard_count} flashcard{s} generated from the {len(_topics)}")
+        # if flashcard_count > 1:
+        #     s = "s"
+        # else:
+        #     s = ''
+        # st.write(f"{flashcard_count} flashcard{s} generated from the {len(_topics)}")
         topic = f"""{topic_en_lijstnummer["topic_naam"]}"""
         messages = [
             {"role": "system", "content": f"""
@@ -408,7 +408,7 @@ def generate_flashcards(_topics, _topics_expanded):
             messages=messages
         )
         flashcard_response = response['choices'][0]['message']['content']
-        generated_flashcards.append(flashcard_response)
+        raw_flashcards.append(flashcard_response)
         flashcard_count += 1
         # st.write(topic)
         # st.write(flashcard_response)
@@ -416,11 +416,15 @@ def generate_flashcards(_topics, _topics_expanded):
     # Split list with flashcards into two separate lists with questions and answers
     flashcard_questions = []
     flashcard_answers = []
-    for cards in generated_flashcards:
+    for cards in raw_flashcards:
         side = cards.split(";")
         flashcard_questions.append(side[0])
         flashcard_answers.append(side[1])
-    return flashcard_questions, flashcard_answers
+    return flashcard_questions, flashcard_answers, raw_flashcards
+
+
+def download_flashcards(anki_flashcards):
+    st.download_button("Download flashcards", anki_flashcards)
 
 
 if __name__ == '__main__':
@@ -437,22 +441,29 @@ if __name__ == '__main__':
 
         slide_texts = pdf_reader(slide_upload)
         slide_chunks = create_chunks(slide_texts)
+        st.write(f"slide_chunks: {slide_chunks}")
         slide_topics = extract_topics(slide_chunks)
-        # st.title("Knowledge Tree")
-        st.write(slide_topics)
+        st.write(f"slide_topics: {slide_topics}")
         slide_topics_structured = structure_topics(slide_topics)
-        # st.write(slide_topics_structured)
+        st.write(f"slide_topics_structured: {slide_topics_structured}")
 
         if book_upload is not None:
             book_vectors = embed_book(book_upload)
             slide_topics_expanded = expand_topics(slide_topics_structured, book_vectors)
-            st.write(slide_topics_expanded)
+            st.write(f"slide_topics_expanded: {slide_topics_expanded}")
             flashcards = generate_flashcards(slide_topics_structured, slide_topics_expanded)
             flashcards_questions = flashcards[0]
             flashcards_answers = flashcards[1]
-            # st.write(flashcards)
-            # st.write(flashcards_questions)
-            # st.write(flashcards_answers)
+
+            # flashcards list to text file to be able to download it later on
+            text_flashcards = ""
+            for flashcard in flashcards[2]:
+                text_flashcards += f"{flashcard}\n\n"
+
+
+            st.write(flashcards[2])
+            st.write(flashcards_questions)
+            st.write(flashcards_answers)
 
             if 'count' not in st.session_state:
                 st.session_state.count = 0
@@ -482,6 +493,7 @@ if __name__ == '__main__':
             main_container.header(slide_topics_structured[0]["topic_naam"])
 
             main_container.write(flashcards_questions[st.session_state.count])
+            download_flashcards(text_flashcards)
 
             col1, col2, col3 = sub_container.columns(3)
 
@@ -493,3 +505,5 @@ if __name__ == '__main__':
 
             with col3:
                 next_button = st.button("Next", on_click=increment_counter, args=(1,))
+
+
