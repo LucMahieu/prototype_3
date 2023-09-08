@@ -347,7 +347,6 @@ if __name__ == '__main__':
             download_flashcards(text_flashcards)
 
             col1, col2, col3 = sub_container.columns(3)
-            sub_container.write("\n\n" + "\n----------------------\n" + "\n\n")
 
             with col1:
                 previous_question = st.button("Previous", on_click=increment_counter, args=(-1,))
