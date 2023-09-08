@@ -55,7 +55,7 @@ def embed_book(book_upload):
 
 
 def create_chunks(text):
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=200, chunk_overlap=40, length_function=len)
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=400, chunk_overlap=80, length_function=len)
     chunks = text_splitter.create_documents([text])
     # st.write(f"The document was divided into {len(chunks)} chunks.")
     return chunks
