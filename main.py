@@ -342,8 +342,9 @@ if __name__ == '__main__':
             main_container.header("Flashcards")
 
             main_container.write(flashcards_questions[st.session_state.count])
-            sub_container2.download_flashcards(text_flashcards)
             sub_container2.write("\n\n" + "\n----------------------\n" + "\n\n")
+
+            download_flashcards(text_flashcards)
 
             col1, col2, col3 = sub_container.columns(3)
             sub_container.write("\n\n" + "\n----------------------\n" + "\n\n")
