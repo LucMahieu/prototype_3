@@ -32,6 +32,7 @@ Stappen:
 
 main_container = st.container()
 sub_container = st.container()
+sub_container2 = st.container()
 
 slide_upload = st.file_uploader("Upload hoorcollegeslides", type='pdf')
 book_upload = st.file_uploader("Upload boek", type='pdf')
@@ -50,7 +51,7 @@ def embed_book(book_upload):
     book_text = pdf_reader(book_upload)
     book_chunks = create_chunks(book_text)
     vector_store = embed_chunks(book_chunks)
-    st.write(f"book_chunks: {book_chunks}")
+    # st.write(f"book_chunks: {book_chunks}")
     return vector_store
 
 
@@ -293,12 +294,12 @@ if __name__ == '__main__':
         # st.write(f"slide_topics: {slide_topics}")
         # slide_topics_structured = structure_topics(slide_topics)
         topic_list = clean_topics(slide_topics)
-        st.write(f"topic_list: {topic_list}")
+        # st.write(f"topic_list: {topic_list}")
 
         if book_upload is not None:
             book_vectors = embed_book(book_upload)
             slide_topics_expanded = expand_topics(topic_list, book_vectors)
-            st.write(f"slide_topics_expanded: {slide_topics_expanded}")
+            # st.write(f"slide_topics_expanded: {slide_topics_expanded}")
             flashcards = generate_flashcards(topic_list, slide_topics_expanded)
             flashcards_questions = flashcards[0]
             flashcards_answers = flashcards[1]
@@ -341,9 +342,11 @@ if __name__ == '__main__':
             main_container.header("Flashcards")
 
             main_container.write(flashcards_questions[st.session_state.count])
-            download_flashcards(text_flashcards)
+            sub_container2(download_flashcards(text_flashcards))
+            sub_container2.write("\n\n" + "\n----------------------\n" + "\n\n")
 
             col1, col2, col3 = sub_container.columns(3)
+            sub_container.write("\n\n" + "\n----------------------\n" + "\n\n")
 
             with col1:
                 previous_question = st.button("Previous", on_click=increment_counter, args=(-1,))
