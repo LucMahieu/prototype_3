@@ -338,7 +338,7 @@ if __name__ == '__main__':
 
 
             main_container.write("\n\n" + "\n----------------------\n" + "\n\n")
-            main_container.header(topic_list[0]["topic_naam"])
+            main_container.header(topic_list)
 
             main_container.write(flashcards_questions[st.session_state.count])
             download_flashcards(text_flashcards)
