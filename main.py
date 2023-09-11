@@ -42,7 +42,7 @@ llm3 = ChatOpenAI(model_name="gpt-3.5-turbo")
 def pdf_reader(uploaded_pdf):
     reader = PdfReader(uploaded_pdf)
     text = ""
-    for page in reader.pages:
+    for page in reader.pages[17:21] :
         text += page.extract_text()
     return text
 
