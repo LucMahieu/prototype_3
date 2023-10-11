@@ -23,7 +23,7 @@ main_container = st.container()
 sub_container = st.container()
 
 # Navigate to next question when button is pressed
-if st.session_state.card_index < len(questions):
+if st.session_state.card_index <= len(questions):
     # Two columns in which the flashcard navigation buttons are placed
     col1, col2 = sub_container.columns(2)
     with col1:
