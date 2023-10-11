@@ -5,7 +5,7 @@ st.set_page_config(
     page_icon="♾️"
 )
 
-st.title("Learnloop")
+st.title("LearnLoop")
 st.write(""" 
 Using Learnloop, you can grasp topics from your study material more quickly and effectively. 
 Learnloop automatically extracts the most important topics and information from your study
