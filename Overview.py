@@ -33,7 +33,7 @@ st.write("""
 **See the potential?** Your donation signals to us that there's a demand for LearnLoop to continue evolving and improving. Every contribution will be directly channeled into the development of new features and the enhancement of our algorithms.
 """)
 
-st.subheader("**Voluntary Donation options:**")
+st.subheader("**Voluntary donation options:**")
 st.write("""€1,00: http://bit.ly/3PPHysV \n
 €2,00: https://bit.ly/3tAq6kt \n
 €3,00: https://bit.ly/3LZ83uH \n
