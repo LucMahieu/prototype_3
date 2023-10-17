@@ -13,7 +13,6 @@ if 'show_answer' not in st.session_state:
 
 # -------------------------BUTTON FUNCTIONS---------------------------- #
 
-
 # -------------------------------MAIN---------------------------------- #
 
 # Progress bar that progresses according to the card number
@@ -22,35 +21,34 @@ card_progress = st.progress(0)
 main_container = st.container()
 sub_container = st.container()
 
-# Navigate to next question when button is pressed
-if st.session_state.card_index < len(questions):
-    # Two columns in which the flashcard navigation buttons are placed
-    col1, col2 = sub_container.columns(2)
-    with col1:
-        if st.button("Show Answer", use_container_width=True):
-            st.session_state.show_answer = True
+# Two columns in which the flashcard navigation buttons are placed
+col1, col2, col3 = sub_container.columns(3)
+with col1:
+    if st.button("Previous question", use_container_width=True):
+        if st.session_state.card_index == 0:  # Als het de eerste vraag is, ga naar de laatste
+            st.session_state.card_index = len(questions) - 1
         else:
-            st.session_state.show_answer = False
-    with col2:
-        if st.button("Next question", use_container_width=True):
-            st.session_state.card_index += 1
-            st.session_state.show_answer = False
-
-    if st.session_state.card_index < len(questions):
-        st.subheader(questions[st.session_state.card_index])
-        if st.session_state.show_answer is True:
-            st.write(answers[st.session_state.card_index])
-    else:
-        st.subheader("Great work! Do you want to Loop through the material again?")
-        st.button("Reset deck")
-
-else:
-    st.subheader("You finished all the questions for this lecture.")
-    # st.balloons()
-    if st.button("Reset deck"):
-        st.session_state.card_index = 0
+            st.session_state.card_index -= 1
         st.session_state.show_answer = False
-        st.experimental_rerun()
+
+with col2:
+    if st.button("Show Answer", use_container_width=True):
+        st.session_state.show_answer = True
+    else:
+        st.session_state.show_answer = False
+
+with col3:
+    if st.button("Next question", use_container_width=True):
+        st.session_state.card_index = (st.session_state.card_index + 1) % len(questions)  # Modulo zorgt ervoor dat het een carrousel wordt
+        st.session_state.show_answer = False
+
+if st.session_state.card_index < len(questions):
+    st.subheader(questions[st.session_state.card_index])
+    if st.session_state.show_answer is True:
+        st.write(answers[st.session_state.card_index])
+else:
+    st.subheader("Great work! Do you want to Loop through the material again?")
+    st.button("Reset deck")
 
 # Update the progress bar according to the card number
 card_progress.progress(st.session_state.card_index / len(questions))
