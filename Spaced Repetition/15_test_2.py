@@ -54,7 +54,7 @@ if 'previous_page_name' not in st.session_state:
 if 'current_page_name' not in st.session_state:
     st.session_state.current_page_name = __file__
 
-# -------------------------------MAIN---------------------------------- #
+
 def initialise_new_page():
     st.session_state.questions = solid_list_questions.copy()
     st.session_state.answers = solid_list_answers.copy()
@@ -63,7 +63,6 @@ def initialise_new_page():
 
 # Read and store current file name
 st.session_state.current_page_name = __file__
-st.write(__file__)
 
 # Check if a new page is opened
 if st.session_state.current_page_name != st.session_state.previous_page_name:
