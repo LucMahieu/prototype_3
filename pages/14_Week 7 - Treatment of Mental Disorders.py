@@ -52,5 +52,3 @@ else:
 
 # Update the progress bar according to the card number
 card_progress.progress(st.session_state.card_index / len(questions))
-
-st.write(f"Dit is een test: {__file__}")
