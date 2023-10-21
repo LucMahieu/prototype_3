@@ -55,9 +55,10 @@ if 'current_page_name' not in st.session_state:
     st.session_state.current_page_name = __file__
 
 # -------------------------------MAIN---------------------------------- #
-def initialise_page_lists():
+def initialise_new_page():
     st.session_state.questions = solid_list_questions.copy()
     st.session_state.answers = solid_list_answers.copy()
+    st.session_state.easy_count = {}
     return
 
 # Read and store current file name
@@ -67,7 +68,7 @@ st.write(__file__)
 # Check if a new page is opened
 if st.session_state.current_page_name != st.session_state.previous_page_name:
     # Change lists in session state with current week lists
-    initialise_page_lists()
+    initialise_new_page()
     st.session_state.previous_page_name = st.session_state.current_page_name
 
 
