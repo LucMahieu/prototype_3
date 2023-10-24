@@ -9,7 +9,7 @@ st.title("LearnLoop")
 
 st.subheader("**Excited for you to be one of the first users of LearnLoop!** ")
 st.write(""" 
-We crafted LearnLoop to help you swiftly and efficiently comprehend subjects from your study materials. It will do this by **automatically transforming your study materials into a more fun and effective learning pathway**. This is the first prototype, so it only contains pre-generated quizzes from one subject and these were manually checked for accuracy by fellow students. With your feedback and that of others, we will determine how to improve the algoritms that drive LearnLoop and what features to build next.
+We crafted LearnLoop to help you swiftly and efficiently comprehend subjects from your study materials. It will do this by **automatically transforming your study materials into a more fun and effective learning pathway**. This is the first prototype, so it only contains pre-generated quizzes from one subject and these were manually checked for accuracy by fellow students. With your feedback and that of others, we will determine how to improve the algorithms that drive LearnLoop and what features to build next.
 """)
 
 # Create two columns
