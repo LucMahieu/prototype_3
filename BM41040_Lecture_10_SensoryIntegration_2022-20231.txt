@@ -1,0 +1,134 @@
+08-05-2017
+Challenge the future
+Delft
+University of
+Technology
+Neuromechanics & Motor control
+(BM41040)
+Lecture 10: Sensory Integration
+25-03-2022
+Winfred Mugge, BioMechanical Engineering
+2 |
+Lectures so far
+• Lecture 1: Introduction to Neuromechanics & Motor Control
+• Lecture 2: 3D Kinematics and Motion recording
+• Lecture 3: Rigid Body Dynamics
+• Lecture 4: Muscle Morphology & Physiology
+• Lecture 5: Muscle Models Hill- and Huxley-type
+• Lecture 6: Muscle Morphology and Function, examples from Biology
+• Lecture 7: Optimization of Muscle Force
+• Lecture 8: Inverse and forward simulation of human motion
+• Lecture 9: Human senses
+• Lecture 10: Sensory integration
+3 |
+Recap lecture 9 (Mark)
+4 |
+Poll!
+What is your current association with the term
+"Sensory Integration"?
+5 |
+Challenges in Human Movement Control
+• How do we control our limbs?
+• Sensory Integration!
+Franklin and Wolpert (2011)
+Scott, 2004
+6 |
+Challenges in Human Movement Control
+• Redundancy
+• 600 muscles controlling 200 joints
+• Noise
+• Sensor and motor noise
+• Delays
+• Neural transportation and processing
+• Uncertainty
+• Incomplete knowledge of environment
+• Nonstationarity
+• Growth, fatigue, and aging
+• Nonlinearity
+• Mapping between muscles vs. endpoint
+And what about
+robot control?
+7 |
+8 |
+Redundancy
+• Muscle redundancy
+• More muscles than DoF
+• Kinematic redundancy
+• Multiple paths to same position
+• Postures with same hand position
+• Sensor redundancy
+• Multiple sensors measure same
+variable
+Trumbower et al. (2009)
+9 |
+Motor noise
+• Finger pushes on force sensor
+• Visual feedback on force
+• Standard deviation of force signal (the
+motor noise!) is proportional with the
+applied force
+• Motor noise increases with force level
+• signal dependent noise
+• Coefficient of variation depends on MVC
+O’Sullivan et al. (2009)
+10 |
+Sensory integration
+• Multiple sensors and sensor types provide ‘redundant’ information
+about the same quantity
+• e.g. location of hand in space
+• Vision
+• Proprioception
+• Sensory input can be
+• Noisy
+• Ambiguous
+• What are the computations to
+integrate the sensory inputs?
+11 |
+Today’s contents
+• Senses and sensory integration
+• Maximum likelihood estimation (MLE)
+• Integration of visual and proprioceptive information
+• Integration of proprioceptive information from different sensors
+• Sensory reweighting in balance control
+12 |
+Integration of sensory information from
+different sensors
+• Location of one’s own body parts in peri-personal space
+• Vision
+• Proprioception
+• Balance control
+• Vestibular system
+• Vision
+• Proprioception
+• Haptics
+• Proprioception
+• Touch (tactile system)
+• Vision
+13 |
+• Example: (blindly) point to a learned position
+0 5 10 15 20
+0.15
+0.16
+0.17
+0.18
+0.19
+0.2
+0.21
+0.22
+0.23
+0.24
+0.25
+trial #
+distance
+0.15 0.2 0.25
+0
+2
+4
+6
+8
+10
+12
+14
+16
+18
+20
