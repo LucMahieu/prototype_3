@@ -18,7 +18,7 @@ The water cycle makes sure water moves around and helps plants grow. Like when i
 
 Output:
 6/10;;
-• Explanation: The student provided a basic description of water movement and its support for plant growth, which touches on the circulation of water and support for life. However, the answer lacks detail and does not mention the regulation of climate. (2/4) \n
-• Example: The student mentions rain in a forest helping plants grow, which aligns with the example in the answer key. However, the example could be more specific and detailed. (2/3) \n
-• Impact: The student’s answer implies the maintenance of balance in ecosystems through supporting plant growth, but does not explicitly mention biodiversity. (2/3) \n
+• Explanation: The student provided a basic description of water movement and its support for plant growth, which touches on the circulation of water and support for life. However, the answer lacks detail and does not mention the regulation of climate. (2/4)
+• Example: The student mentions rain in a forest helping plants grow, which aligns with the example in the answer key. However, the example could be more specific and detailed. (2/3)
+• Impact: The student’s answer implies the maintenance of balance in ecosystems through supporting plant growth, but does not explicitly mention biodiversity. (2/3)
 
