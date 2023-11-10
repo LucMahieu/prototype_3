@@ -17,6 +17,7 @@ from langchain.chains import RetrievalQA
 
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
+print("Starting up with API KEY:", openai.api_key)
 # openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 st.title("Learnloop")
@@ -291,6 +292,8 @@ if __name__ == '__main__':
         slide_chunks = create_chunks(slide_texts)
         slide_topics = extract_topics(slide_chunks)
         topic_list = clean_topics(slide_topics)
+
+        print(topic_list)
 
         if book_upload is not None:
             book_vectors = embed_book(book_upload)
