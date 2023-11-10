@@ -137,10 +137,12 @@ def space_repetition_page(title, questions, answers):
     client = OpenAI()
     def evaluate_answer(answer, question, gold_answer):
         prompt = f"Question: {question}\nCorrect Answer: {gold_answer}\nUser Answer: {answer}\nIs the user's answer correct?"
-        role_prompt = "I want you to act as a professor that marks the exam of a student. " \
-                        "Your goal is to quantify the correctness of the answer given as a percentage, like X%. Give this percentage as the first return token, add a delimiter between this and the rest of the input using ;; " \
-                        "You are critical and don't let students pass easily. You also identify what parts the student didn't get correct, if applicable and give feedback on how to improve." \
-                        "Give your feedback in dutch."
+
+        # Read the role prompt from a file
+        with open("./pages/system_role_prompt.txt", "r") as f:
+            role_prompt = f.read()
+
+        print(role_prompt)
 
         response = client.chat.completions.create(
             model="gpt-3.5-turbo-1106",
