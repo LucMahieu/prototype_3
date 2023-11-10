@@ -177,7 +177,7 @@ def space_repetition_page(title, questions, answers):
 
         # Displaying score and feedback with formatting within the div
         result_html = f"""
-        <div style='background-color: {color}; padding: 25px; border-radius: 5px;'>
+        <div style='background-color: {color}; padding: 25px; margin-bottom: 10px; border-radius: 5px;'>
             <h1 style='font-size: 40px; margin: 0;'>{st.session_state.score}</h1>
             <p style='font-size: 20px; font-style: italic; margin: 0;'>{st.session_state.feedback}</p>
         </div>
@@ -207,6 +207,21 @@ def space_repetition_page(title, questions, answers):
     # After submission, display the result
     if st.session_state.submitted:
         display_result()
+
+        def reset():
+            st.session_state.submitted = False
+            st.session_state.score = ""
+            st.session_state.feedback = ""
+            st.session_state.answer = ""
+            st.session_state.show_answer = False
+            st.session_state.easy_count = {}
+            st.session_state.questions.pop(0)
+            st.session_state.answers.pop(0)
+
+        # Reset button
+        st.empty()
+        st.button('Next question >', on_click=reset)
+
 
 # ====================
 
