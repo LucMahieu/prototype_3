@@ -203,6 +203,29 @@
         "Ontwenning is een fysiologische en psychologische toestand die wordt gekenmerkt door gevoelens van angst, spanning en verlangen naar de verslavende stof.",
         "Binge drinking is het drinken van vijf of meer drankjes in één zitting. Dit kan leiden tot ernstige gezondheidsproblemen zoals alcoholvergiftiging en leverziekte."
       ]
+    },
+    {
+      "title": "Voorbeeld leertraject: Actiepotentiaal",
+      "questions": [
+        "Kun je uitleggen hoe een actiepotentiaal vergelijkbaar is met de stroom van elektriciteit door een draad?",
+        "Wat is de rustpotentiaal en waarom is deze belangrijk?",
+        "Wat veroorzaakt het begin van een actiepotentiaal in een neuron?",
+        "Wat gebeurt er met de elektrische lading binnen een neuron tijdens depolarisatie?",
+        "Hoe beweegt een actiepotentiaal zich langs een neuron?",
+        "Wat is repolarisatie en hoe helpt dit proces het neuron om terug te keren naar zijn rusttoestand?",
+        "Wat is de refractaire periode en waarom is het belangrijk voor de richting en frequentie van actiepotentialen?",
+        "Kun je beschrijven hoe een actiepotentiaal bijdraagt aan de communicatie tussen neuronen?"
+      ],
+      "answers" : [
+        "- Het benadrukken dat een actiepotentiaal **een elektrisch signaal is**. (2 punten)\n- Het vermelden dat het signaal **zich langs het neuron verplaatst, vergelijkbaar met hoe elektriciteit door een draad reist**. (2 punten)",
+        "- Het definiëren van rustpotentiaal als **de negatieve elektrische lading binnen een neuron in rust**. (2 punten)\n- Het uitleggen dat dit de neuron in **een staat van paraatheid houdt voor activatie**. (2 punten)",
+        "- Het vermelden dat een **voldoende sterk signaal** de oorzaak is. (2 punten)\n- Het benadrukken dat dit signaal de **drempelwaarde overschrijdt en een verandering in de elektrische lading veroorzaakt**. (2 punten)",
+        "- Het uitleggen dat tijdens depolarisatie **het neuron van een negatieve naar een positieve lading binnenin gaat**. (2 punten)\n- Het aangeven dat dit een **omkering van de normale ladingstoestand van de cel is**. (2 punten)",
+        "- Het beschrijven van de actiepotentiaal als **een golf die zich langs het neuron verplaatst**. (2 punten)\n- Het specificeren dat deze **begint bij het cellichaam en langs het axon naar het einde van het neuron beweegt**. (2 punten)",
+        "- Het definiëren van repolarisatie als **het proces waarbij de lading binnen het neuron terugkeert naar een negatieve staat**. (2 punten)\n- Het uitleggen dat dit proces **het neuron in staat stelt om terug te keren naar zijn rusttoestand**. (2 punten)",
+        "- Het beschrijven van de refractaire periode als **een tijdsperiode na een actiepotentiaal waarin geen nieuwe actiepotentiaal gestart kan worden**. (2 punten)\n- Het verklaren dat dit zorgt voor **eenrichtingsverkeer van het signaal en tijd voor herstel van het neuron**. (2 punten)",
+        "- Het benadrukken dat een actiepotentiaal **het signaal langs het axon verstuurt**. (2 punten)\n- Het uitleggen dat dit leidt tot **de afgifte van neurotransmitters, die het signaal overbrengen naar het volgende neuron**. (2 punten)"
+      ]
     }
   ]
 }

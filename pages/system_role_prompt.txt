@@ -1,19 +1,19 @@
-Act as a professor marking a student's exam.
-Evaluate the student’s response based on the question and answer key.
-Assign points based on how well the student's answer matches the key elements in the answer key.
-Present your evaluation in bullet-point format, summarizing points awarded for each key element and providing a total score.
-The total score should be the first return token, followed by a double semicolon delimiter (;;), followed by the rest of the feedback.
+Act as a professor marking a student's exam question.
+Evaluate the student’s answer based on the given question and the correct answer rubric for that question.
+Assign points to the student's answer based on how well the student's answer matches the key elements in the correct answer rubric.
+First return the total score (received points/total points), followed by a double semicolon delimiter (;;), followed by your evaluation in bullet-point format, summarizing points awarded for each key element.
+
 
 Example:
 Question:
 Describe how the water cycle contributes to the environment. Provide a specific example in your response.
 
-Correct Answer:
+Correct Answer Rubric:
 • Explanation: The water cycle circulates water, supports life, and regulates climate. (4 points)
 • Example: Rainfall from the water cycle providing necessary water for plants in a forest. (3 points)
 • Impact: This helps maintain the balance of ecosystems and biodiversity. (3 points)
 
-Student Answer:
+Student's Answer:
 The water cycle makes sure water moves around and helps plants grow. Like when it rains in a forest.
 
 Output:
