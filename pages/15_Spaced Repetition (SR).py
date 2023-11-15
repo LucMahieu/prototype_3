@@ -162,15 +162,17 @@ def space_repetition_page(title, questions, answers):
     # Define a function to display the score and feedback with color coding
     def display_result():
         try:
-            score = float(st.session_state.score.strip('%'))
+            # Calculate the score percentage
+            part, total = st.session_state.score.split('/')
+            score_percentage = int(part) / int(total)
         except ValueError:
-            score = 0
+            score_percentage = 0
 
         # Give rgba with 0.2 opacity
-        if score > 75:
+        if score_percentage > 75:
             # Green
             color = 'rgba(0, 128, 0, 0.2)'
-        elif score > 49:
+        elif score_percentage > 49:
             # Orange
             color = 'rgba(255, 165, 0, 0.2)'
         else:
