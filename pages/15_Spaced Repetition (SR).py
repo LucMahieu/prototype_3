@@ -169,10 +169,10 @@ def space_repetition_page(title, questions, answers):
             score_percentage = 0
 
         # Give rgba with 0.2 opacity
-        if score_percentage > 75:
+        if score_percentage > 0.75:
             # Green
             color = 'rgba(0, 128, 0, 0.2)'
-        elif score_percentage > 49:
+        elif score_percentage > 0.49:
             # Orange
             color = 'rgba(255, 165, 0, 0.2)'
         else:
