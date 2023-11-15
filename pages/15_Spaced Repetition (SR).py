@@ -145,7 +145,7 @@ def space_repetition_page(title, questions, answers):
         print(role_prompt)
 
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo-1106",
+            model="gpt-4-1106-preview",
             messages=[
                 {"role": "system", "content": role_prompt},
                 {"role": "user", "content": prompt}
