@@ -124,9 +124,9 @@ def space_repetition_page(title, questions, answers):
 
 
     ## Answer input field
-    def process_answer(input_text):
+    def process_answer():
         with st.spinner('Evaluating your answer...'):
-            score, feedback = evaluate_answer(input_text, st.session_state.questions[0], st.session_state.answers[0])
+            score, feedback = evaluate_answer(st.session_state.answer, st.session_state.questions[0], st.session_state.answers[0])
         # Store the score and feedback in the session state to access them after the input disappears
         st.session_state.submitted = True
         st.session_state.score = score
