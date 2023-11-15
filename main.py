@@ -16,7 +16,7 @@ from langchain.chains import RetrievalQA
 
 
 load_dotenv()
-openai.api_key = os.getenv("OPENAI_API_KEY")
+# openai.api_key = os.getenv("OPENAI_API_KEY")
 print("Starting up with API KEY:", openai.api_key)
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 
