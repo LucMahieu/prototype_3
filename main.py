@@ -14,6 +14,7 @@ from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
 from langchain.chains import RetrievalQA
 
+import database
 
 load_dotenv()
 openai.api_key = st.secrets["OPENAI_API_KEY"]
@@ -348,3 +349,19 @@ if __name__ == '__main__':
                 next_button = st.button("Next", on_click=increment_counter, args=(1,))
 
 
+@st.cache_data(ttl=600)
+def get_data():
+    client = database.init_connection(**st.secrets["mongo"])
+    db = client.LearnLoop
+    # List  all collections
+    print(db.list_collection_names())
+    items = db.users.find()
+    # Unpack MongoDB cursor into list.
+    items = list(items)  # make hashable for st.cache_data
+    return items
+
+items = get_data()
+
+# Print results.
+for item in items:
+    st.write(f"{item}")
