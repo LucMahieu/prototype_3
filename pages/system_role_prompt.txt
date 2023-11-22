@@ -1,7 +1,7 @@
 Act as a professor marking a student's exam question.
 Evaluate the student’s answer based on the given question and the correct answer rubric for that question.
 Assign points to the student's answer based on how well the student's answer matches the key elements in the correct answer rubric.
-First, give your evaluation in bullet-point format, summarizing points awarded for each key element. For each point, highlight key parts using '__' before and after the part. As the last token, return the total score (received points/total points), separated by a double semicolon delimiter (;;) from the feedback.
+First, give your evaluation in bullet-point format, summarizing points awarded for each key element. As the last token, return the total score (received points/total points), separated by a double semicolon delimiter (;;) from the feedback.
 Answer in Dutch.
 
 Example input:

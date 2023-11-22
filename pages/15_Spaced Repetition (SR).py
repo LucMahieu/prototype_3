@@ -142,20 +142,27 @@ def space_repetition_page(title, questions, answers):
         with open("./pages/system_role_prompt.txt", "r") as f:
             role_prompt = f.read()
 
-        print(role_prompt)
+        print({"role": "system", "content": role_prompt},
+                {"role": "user", "content": prompt})
 
         response = client.chat.completions.create(
-            model="gpt-4-1106-preview",
+            model="gpt-3.5-turbo-1106",
             messages=[
                 {"role": "system", "content": role_prompt},
                 {"role": "user", "content": prompt}
             ],
             max_tokens=120
         )
+
         print(response)
 
-        score = response.choices[0].message.content.split(";;")[0]
-        feedback = response.choices[0].message.content.split(";;")[1]
+        split_response = response.choices[0].message.content.split(";;")
+
+        if len(split_response) != 2:
+            raise ValueError("Server response is not in the correct format. Please retry.")
+
+        feedback = split_response[0].split(">>")
+        score = split_response[1]
 
         return score, feedback
 
@@ -180,10 +187,12 @@ def space_repetition_page(title, questions, answers):
             color = 'rgba(255, 0, 0, 0.2)'
 
         # Displaying score and feedback with formatting within the div
+        formatted_feedback = [f"<p style='font-size: 20px; font-style: italic; margin: 0;'>{f}</p>" for f in st.session_state.feedback]
+
         result_html = f"""
         <div style='background-color: {color}; padding: 25px; margin-bottom: 10px; border-radius: 5px;'>
             <h1 style='font-size: 40px; margin: 0;'>{st.session_state.score}</h1>
-            <p style='font-size: 20px; font-style: italic; margin: 0;'>{st.session_state.feedback}</p>
+            {''.join(formatted_feedback)}
         </div>
         """
         st.markdown(result_html, unsafe_allow_html=True)
