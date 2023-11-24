@@ -20,16 +20,12 @@ load_dotenv()
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 print("Starting up with API KEY:", openai.api_key)
 
-st.title("Learnloop")
-"""
-Met Learnloop kun je de onderwerpen uit hoorcolleges op een effectievere manier leren doordat Learnloop automatisch de 
-onderwerpen uit het hoorcollege haalt, deze aanvult en fact-checked met het boek en over die kennis flashcards maakt.
+st.set_page_config(page_title="LearnLoop", layout="centered")
+st.title("🎓 LearnLoop")
 
-Stappen:
-1. Upload je slides van een hoorcollege.
-2. Upload het boek dat hoort bij het vak.
-3. De slides worden automatisch omgezet tot flashcards. ***De verwerking hiervan kan enkele minuten duren.***
-4. Onderaan de pagina kun je de flashcards downloaden om in ANKI te zetten.
+"""
+Dit is het Admin Panel, dit zou alleen voor de admin users toegangkelijk moeten zijn. Hier kun je hele courses inladen.
+Dit is nog geen functie voor users.
 """
 
 main_container = st.container()
@@ -347,21 +343,3 @@ if __name__ == '__main__':
 
             with col3:
                 next_button = st.button("Next", on_click=increment_counter, args=(1,))
-
-
-@st.cache_data(ttl=600)
-def get_data():
-    client = database.init_connection(**st.secrets["mongo"])
-    db = client.LearnLoop
-    # List  all collections
-    print(db.list_collection_names())
-    items = db.users.find()
-    # Unpack MongoDB cursor into list.
-    items = list(items)  # make hashable for st.cache_data
-    return items
-
-items = get_data()
-
-# Print results.
-for item in items:
-    st.write(f"{item}")
