@@ -118,7 +118,7 @@ def space_repetition_page(title, questions, answers):
     from openai import OpenAI
     client = OpenAI()
     def evaluate_answer(answer, question, gold_answer):
-        prompt = f"Vraag: {question}\nAntwoord student: {answer}\nBeoordelingsrubriek: {gold_answer}\n"
+        prompt = f"Input:\nVraag: {question}\nAntwoord student: {answer}\nBeoordelingsrubriek: {gold_answer}\nOutput:\n"
 
         # Read the role prompt from a file
         with open("./pages/system_role_prompt.txt", "r") as f:
@@ -128,7 +128,7 @@ def space_repetition_page(title, questions, answers):
                 {"role": "user", "content": prompt})
 
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo-1106",
+            model="gpt-4-1106-preview",
             messages=[
                 {"role": "system", "content": role_prompt},
                 {"role": "user", "content": prompt}
@@ -143,8 +143,7 @@ def space_repetition_page(title, questions, answers):
         if len(split_response) != 2:
             raise ValueError("Server response is not in the correct format. Please retry.")
 
-        # feedback = split_response[0].split(">>")
-        feedback = split_response[0]
+        feedback = split_response[0].split(">>")
         score = split_response[1]
 
         return score, feedback
@@ -169,9 +168,28 @@ def space_repetition_page(title, questions, answers):
             # Red
             color = 'rgba(255, 0, 0, 0.2)'
 
-        # # Displaying score and feedback with formatting within the div
+        # Each element corresponds to a new line
+        feedback_lines = ["", "", "", "", "", "", "", ""]
+        for i in range(len(st.session_state.feedback)):
+            feedback_lines[i] = st.session_state.feedback[i]
+
+        result_html = f"""
+        <div style='background-color: {color}; padding: 25px; margin-bottom: 20px; border-radius: 8px;'>
+            <h1 style='font-size: 30px; margin: 0;'>{st.session_state.score}</h1>
+            <p style='font-size: 20px; margin: 0;'>{feedback_lines[0]}</p>
+            <p style='font-size: 20px; margin: 0;'>{feedback_lines[1]}</p>
+            <p style='font-size: 20px; margin: 0;'>{feedback_lines[2]}</p>
+            <p style='font-size: 20px; margin: 0;'>{feedback_lines[3]}</p>
+            <p style='font-size: 20px; margin: 0;'>{feedback_lines[4]}</p>     
+            <p style='font-size: 20px; margin: 0;'>{feedback_lines[5]}</p>     
+            <p style='font-size: 20px; margin: 0;'>{feedback_lines[6]}</p>
+            <p style='font-size: 20px; margin: 0;'>{feedback_lines[7]}</p>
+        </div>
+        """
+
+        # Displaying score and feedback with formatting within the div
         # formatted_feedback = [f"<p style='font-size: 20px; font-style: italic; margin: 0;'>{f}</p>" for f in st.session_state.feedback]
-        #
+
         # result_html = f"""
         # <div style='background-color: {color}; padding: 25px; margin-bottom: 10px; border-radius: 5px;'>
         #     <h1 style='font-size: 30px; margin: 0;'>{st.session_state.score}</h1>
@@ -179,10 +197,7 @@ def space_repetition_page(title, questions, answers):
         # </div>
         # """
 
-        # st.markdown(result_html, unsafe_allow_html=True)
-
-        st.write(st.session_state.score)
-        st.write(st.session_state.feedback)
+        st.markdown(result_html, unsafe_allow_html=True)
 
     # Initialize session state variables if they don't exist
     if 'submitted' not in st.session_state:
@@ -208,12 +223,9 @@ def space_repetition_page(title, questions, answers):
 
     # After submission, display the result
     if st.session_state.submitted:
+
         # Display the feedback
         display_result()
-
-        # # Display the correct answer
-        # if st.session_state.show_answer:
-        #     st.write(st.session_state.answers[0])
 
         def reset(difficulty):
             st.session_state.submitted = False
@@ -245,8 +257,13 @@ def space_repetition_page(title, questions, answers):
         with col3:
             st.button('Hard', use_container_width=True, on_click=lambda: reset('hard'))
 
-        # if st.button('Show Answer', use_container_width=True):
-        #     st.session_state.show_answer = not st.session_state.show_answer
+        def toggle_answer():
+            st.session_state.show_answer = not st.session_state.show_answer
+
+        st.button('Show Answer', use_container_width=True, on_click=toggle_answer)
+
+        if st.session_state.show_answer:
+            st.write(st.session_state.answers[0])
 
         # Restart card carousel (reset deck)
         if len(st.session_state.questions) == 0:
