@@ -6,7 +6,7 @@ Answer in Dutch.
 
 Example input:
 Question:
-Beschrijf hoe de waterkringloop bijdraagt aan het milieu. Geef een specifiek voorbeeld in je antwoord.
+Beschrijf hoe sde waterkringloop bijdraagt aan het milieu. Geef een specifiek voorbeeld in je antwoord.
 
 User answer:
 De waterkringloop zorgt ervoor dat water zich verplaatst en helpt planten te groeien. Zoals wanneer het regent in een bos.
