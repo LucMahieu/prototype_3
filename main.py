@@ -38,7 +38,7 @@ sub_container2 = st.container()
 
 slide_upload = st.file_uploader("Upload hoorcollegeslides", type='pdf')
 book_upload = st.file_uploader("Upload boek", type='pdf')
-llm3 = ChatOpenAI(model_name="gpt-3.5-turbo")
+llm3 = ChatOpenAI(model_name="gpt-4-1106-preview")
 
 def pdf_reader(uploaded_pdf):
     reader = PdfReader(uploaded_pdf)
