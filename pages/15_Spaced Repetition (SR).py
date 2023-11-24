@@ -118,7 +118,7 @@ def space_repetition_page(title, questions, answers):
     from openai import OpenAI
     client = OpenAI()
     def evaluate_answer(answer, question, gold_answer):
-        prompt = f"Question: {question}\nCorrect Answer: {gold_answer}\nUser Answer: {answer}\nIs the user's answer correct?"
+        prompt = f"Vraag: {question}\nAntwoord student: {answer}\nBeoordelingsrubriek: {gold_answer}\n"
 
         # Read the role prompt from a file
         with open("./pages/system_role_prompt.txt", "r") as f:
@@ -133,7 +133,7 @@ def space_repetition_page(title, questions, answers):
                 {"role": "system", "content": role_prompt},
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=120
+            max_tokens=300
         )
 
         print(response)
