@@ -143,7 +143,8 @@ def space_repetition_page(title, questions, answers):
         if len(split_response) != 2:
             raise ValueError("Server response is not in the correct format. Please retry.")
 
-        feedback = split_response[0].split(">>")
+        # feedback = split_response[0].split(">>")
+        feedback = split_response[0]
         score = split_response[1]
 
         return score, feedback
@@ -168,16 +169,20 @@ def space_repetition_page(title, questions, answers):
             # Red
             color = 'rgba(255, 0, 0, 0.2)'
 
-        # Displaying score and feedback with formatting within the div
-        formatted_feedback = [f"<p style='font-size: 20px; font-style: italic; margin: 0;'>{f}</p>" for f in st.session_state.feedback]
+        # # Displaying score and feedback with formatting within the div
+        # formatted_feedback = [f"<p style='font-size: 20px; font-style: italic; margin: 0;'>{f}</p>" for f in st.session_state.feedback]
+        #
+        # result_html = f"""
+        # <div style='background-color: {color}; padding: 25px; margin-bottom: 10px; border-radius: 5px;'>
+        #     <h1 style='font-size: 30px; margin: 0;'>{st.session_state.score}</h1>
+        #     {''.join(formatted_feedback)}
+        # </div>
+        # """
 
-        result_html = f"""
-        <div style='background-color: {color}; padding: 25px; margin-bottom: 10px; border-radius: 5px;'>
-            <h1 style='font-size: 30px; margin: 0;'>{st.session_state.score}</h1>
-            {''.join(formatted_feedback)}
-        </div>
-        """
-        st.markdown(result_html, unsafe_allow_html=True)
+        # st.markdown(result_html, unsafe_allow_html=True)
+
+        st.write(st.session_state.score)
+        st.write(st.session_state.feedback)
 
     # Initialize session state variables if they don't exist
     if 'submitted' not in st.session_state:
