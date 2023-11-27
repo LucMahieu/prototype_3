@@ -129,7 +129,7 @@ def space_repetition_page(title, questions, answers):
                 {"role": "user", "content": prompt})
 
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo-1106",
+            model="gpt-4-1106-preview",
             messages=[
                 {"role": "system", "content": role_prompt},
                 {"role": "user", "content": prompt}
@@ -281,7 +281,7 @@ def space_repetition_page(title, questions, answers):
         st.button('Explanation', use_container_width=True, on_click=toggle_answer)
 
         if st.session_state.show_answer:
-            st.write(st.session_state.answers[0])
+            st.markdown(st.session_state.answers[0])
 
         # Restart card carousel (reset deck)
         if len(st.session_state.questions) == 0:
