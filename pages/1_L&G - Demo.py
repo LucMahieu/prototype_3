@@ -8,11 +8,6 @@ from PIL import Image
 # st.markdown("Here's how it works: You rate the difficulty of a flashcard, and the algorithm organizes the deck so that **harder flashcards appear more frequently**. If you find a flashcard **easy two times in a row**, it's removed from the list and you will progress.")
 # st.markdown("IMPORTANT: Your **progress is not saved** and is therefore lost when you refresh the page or switch pages. It is the current limitation of the prototype and will be fixed in later versions.")
 
-
-image = Image.open('open_field_area.png')
-
-st.image(image)
-
 def space_repetition_page(title, questions, answers):
     # Check if title is the same, else reset
     if 'title' not in st.session_state or st.session_state.title != title:
@@ -109,7 +104,7 @@ def space_repetition_page(title, questions, answers):
     progress_bar = st.progress(0)
     progress_bar.progress(int(sum(st.session_state.easy_count.values()) / (2 * len(questions)) * 100))
 
-    st.subheader(st.session_state.questions[0])
+    question_cont = st.container()
 
     ## Answer input field
     def process_answer(input_text):
@@ -134,7 +129,7 @@ def space_repetition_page(title, questions, answers):
                 {"role": "user", "content": prompt})
 
         response = client.chat.completions.create(
-            model="gpt-4-1106-preview",
+            model="gpt-3.5-turbo-1106",
             messages=[
                 {"role": "system", "content": role_prompt},
                 {"role": "user", "content": prompt}
@@ -218,13 +213,30 @@ def space_repetition_page(title, questions, answers):
     if 'difficulty' not in st.session_state:
         st.session_state.difficulty = ""
 
+    # Condition used to indicate if current question is infobit
+    infobit = st.session_state.questions[0][0:8] == "Infobit:"
+
     # Text input field and submit button
-    if not st.session_state.submitted:
+    if not st.session_state.submitted and infobit is not True:
         answer = st.text_area(label='Your answer', label_visibility='hidden', placeholder="Type your answer", key='answer')
         st.button('Submit', on_click=process_answer, use_container_width=True, args=(answer,))
+        with question_cont:
+            st.subheader(st.session_state.questions[0])
+    # Display infobit
+    elif not st.session_state.submitted and infobit:
+        with question_cont:
+            info, title, text = st.session_state.questions[0].split("//")
+            st.subheader(title)
+            st.write(text)
+        st.button('Next', use_container_width=True, on_click=change_card_index(100))
+        current_card = st.session_state.questions[0]
+        if current_card in st.session_state.easy_count:
+            st.session_state.easy_count[current_card] += 1
+        else:
+            st.session_state.easy_count[current_card] = 1
     else:
         # Display the submitted text as solid text
-        st.write("Jouw antwoord:")
+        st.write("Your answer:")
         st.write(st.session_state.answer)
 
     # After submission, display the result
@@ -266,7 +278,7 @@ def space_repetition_page(title, questions, answers):
         def toggle_answer():
             st.session_state.show_answer = not st.session_state.show_answer
 
-        st.button('Show Answer', use_container_width=True, on_click=toggle_answer)
+        st.button('Explanation', use_container_width=True, on_click=toggle_answer)
 
         if st.session_state.show_answer:
             st.write(st.session_state.answers[0])
