@@ -1349,7 +1349,7 @@ Sleep allows body to rest and repair itself. Showing that the amount of sleep is
 
 Circadian rhythm theory
 
-Evolved because animals won’t be awake at night. Than the world becomes a dangerous place. Better to sleep than. Thus, an animal’s typical amount of sleep depends on how much time that animal needs to obtain food, how easily it can hide, and how vulnerable it is to attack. Small animals tend to sleep a lot. Large animals vulnerable to attack, such as cows and deer, sleep little.
+Evolved because animals won’t be awake at night. Than the world becomes a dangerous place. Better to sleep than. Thus, an animal’s typical amount of sleep depends on how much time that animal needs to obtain food, how easily it can hidden, and how vulnerable it is to attack. Small animals tend to sleep a lot. Large animals vulnerable to attack, such as cows and deer, sleep little.
 
 Facilitation of learning theory
 
@@ -2201,7 +2201,7 @@ Stability in personality refers to a lack of change in where a person stands on 
 
 Mean-level changes
 
-Focusing only on rank-order stability can hide changes in personality that many people experience at the same stages of life, referred to as mean-level changes. For example, people tend to get less neurotic, less open to new experiences; more agreeable and more conscientious, even though their rank ordering remains stable. 
+Focusing only on rank-order stability can hidden changes in personality that many people experience at the same stages of life, referred to as mean-level changes. For example, people tend to get less neurotic, less open to new experiences; more agreeable and more conscientious, even though their rank ordering remains stable. 
 
 Evaluative
 

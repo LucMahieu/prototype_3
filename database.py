@@ -13,6 +13,3 @@ def init_connection(username, password, host):
     except Exception as e:
         print(e)
         return None
-
-
-

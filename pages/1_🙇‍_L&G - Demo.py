@@ -323,18 +323,30 @@ def display_page(page_title, content):
         page_content = content[page_idx]
         space_repetition_page(page_content['title'], page_content['questions'], page_content['answers'])
 
-utils.init_session_state()
-if st.session_state["authentication_status"] is False or None:
-    st.warning('Please enter your credentials on the homepage')
-else:
-    # Load content from JSON
-    content = load_content()
-    pages = get_pages(content)
+# Load content from JSON
+content = load_content()
+pages = get_pages(content)
 
-    # Loop through each option and create a button for it in the sidebar
-    st.sidebar.header("Subjects")
-    for option in pages:
-        if st.sidebar.button(option):
-            # Display the selected page and reset the state if needed
-            display_page(option, content)
+# Loop through each option and create a button for it in the sidebar
+st.sidebar.header("Subjects")
+for option in pages:
+    if st.sidebar.button(option):
+        # Display the selected page and reset the state if needed
+        display_page(option, content)
+
+
+# utils.init_session_state()
+# if st.session_state["authentication_status"] is False or st.session_state["authentication_status"] is None:
+#     st.warning('Please enter your credentials on the homepage')
+# else:
+#     # Load content from JSON
+#     content = load_content()
+#     pages = get_pages(content)
+#
+#     # Loop through each option and create a button for it in the sidebar
+#     st.sidebar.header("Subjects")
+#     for option in pages:
+#         if st.sidebar.button(option):
+#             # Display the selected page and reset the state if needed
+#             display_page(option, content)
 
