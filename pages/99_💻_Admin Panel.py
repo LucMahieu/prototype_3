@@ -24,6 +24,7 @@ print("Starting up with API KEY:", openai.api_key)
 st.set_page_config(page_title="LearnLoop", layout="centered")
 st.title("🎓 LearnLoop")
 
+
 def pdf_reader(uploaded_pdf):
     reader = PdfReader(uploaded_pdf)
     text = ""
@@ -265,13 +266,24 @@ utils.init_session_state()
 if st.session_state["authentication_status"] is not 'admin':
     st.warning('You are not an admin.')
 else:
+    """
+    Met Learnloop kun je de onderwerpen uit hoorcolleges op een effectievere manier leren doordat Learnloop automatisch de 
+    onderwerpen uit het hoorcollege haalt, deze aanvult en fact-checked met het boek en over die kennis flashcards maakt.
+
+    Stappen:
+    1. Upload je slides van een hoorcollege.
+    2. Upload het boek dat hoort bij het vak.
+    3. De slides worden automatisch omgezet tot flashcards. ***De verwerking hiervan kan enkele minuten duren.***
+    4. Onderaan de pagina kun je de flashcards downloaden om in ANKI te zetten.
+    """
+
     main_container = st.container()
     sub_container = st.container()
     sub_container2 = st.container()
 
     slide_upload = st.file_uploader("Upload hoorcollegeslides", type='pdf')
     book_upload = st.file_uploader("Upload boek", type='pdf')
-    llm3 = ChatOpenAI(model_name="gpt-3.5-turbo")
+    llm3 = ChatOpenAI(model_name="gpt-4-1106-preview")
 
     if slide_upload is not None:
         current_pdf_name = slide_upload.name[:-4]
