@@ -3,9 +3,6 @@ import json
 import streamlit as st
 from PIL import Image
 
-import utils
-
-
 # st.title("Spaced Repetition Versions")
 # st.write("The pages below this page contain the same flashcards per week, but the quizzes use a spaced repetition algorithm that makes studying more effective. This way you can choose to use the learning style you prefer.")
 # st.markdown("Here's how it works: You rate the difficulty of a flashcard, and the algorithm organizes the deck so that **harder flashcards appear more frequently**. If you find a flashcard **easy two times in a row**, it's removed from the list and you will progress.")
@@ -305,36 +302,22 @@ def load_content():
 
 # Create a list of possible pages based on the titles in the json file
 def get_pages(content):
-    titles = [page['title'] for page in content]
-
-    # # Add percentages (for now just add random)
-    percentages = [10, 20, 30]
-    titles = [f"{title} ({percentage}%)" for title, percentage in zip(titles, percentages)]
-
-    return titles
-
+    return [page['title'] for page in content]
 
 # Function to handle page display
 def display_page(page_title, content):
-    page_title = page_title.split(" (")[0]
-
     page_idx = next((index for (index, d) in enumerate(content) if d["title"] == page_title), None)
     if page_idx is not None:
         page_content = content[page_idx]
         space_repetition_page(page_content['title'], page_content['questions'], page_content['answers'])
 
-utils.init_session_state()
-if st.session_state["authentication_status"] is False or None:
-    st.warning('Please enter your credentials on the homepage')
-else:
-    # Load content from JSON
-    content = load_content()
-    pages = get_pages(content)
+# Load content from JSON
+content = load_content()
+pages = get_pages(content)
 
-    # Loop through each option and create a button for it in the sidebar
-    st.sidebar.header("Subjects")
-    for option in pages:
-        if st.sidebar.button(option):
-            # Display the selected page and reset the state if needed
-            display_page(option, content)
+# Create navbar
+selected_page = st.sidebar.selectbox("Choose a page", pages)
+
+# Display the selected page and reset the state if needed
+display_page(selected_page, content)
 
