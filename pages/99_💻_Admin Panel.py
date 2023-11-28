@@ -15,6 +15,7 @@ from langchain.vectorstores import FAISS
 from langchain.chains import RetrievalQA
 
 import database
+import utils
 
 load_dotenv()
 openai.api_key = st.secrets["OPENAI_API_KEY"]
@@ -22,19 +23,6 @@ print("Starting up with API KEY:", openai.api_key)
 
 st.set_page_config(page_title="LearnLoop", layout="centered")
 st.title("🎓 LearnLoop")
-
-"""
-Dit is het Admin Panel, dit zou alleen voor de admin users toegangkelijk moeten zijn. Hier kun je hele courses inladen.
-Dit is nog geen functie voor users.
-"""
-
-main_container = st.container()
-sub_container = st.container()
-sub_container2 = st.container()
-
-slide_upload = st.file_uploader("Upload hoorcollegeslides", type='pdf')
-book_upload = st.file_uploader("Upload boek", type='pdf')
-llm3 = ChatOpenAI(model_name="gpt-3.5-turbo")
 
 def pdf_reader(uploaded_pdf):
     reader = PdfReader(uploaded_pdf)
@@ -272,7 +260,19 @@ def clean_topics(text):
             lines_cleaned.append(line)
     return lines_cleaned
 
-if __name__ == '__main__':
+utils.init_session_state()
+
+if st.session_state["authentication_status"] is not 'admin':
+    st.warning('You are not an admin.')
+else:
+    main_container = st.container()
+    sub_container = st.container()
+    sub_container2 = st.container()
+
+    slide_upload = st.file_uploader("Upload hoorcollegeslides", type='pdf')
+    book_upload = st.file_uploader("Upload boek", type='pdf')
+    llm3 = ChatOpenAI(model_name="gpt-3.5-turbo")
+
     if slide_upload is not None:
         current_pdf_name = slide_upload.name[:-4]
         if 'previous_pdf_name' not in st.session_state:

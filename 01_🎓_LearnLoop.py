@@ -15,8 +15,10 @@ from langchain.vectorstores import FAISS
 from langchain.chains import RetrievalQA
 
 import database
+import utils
 
 load_dotenv()
+utils.init_session_state()
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 print("Starting up with API KEY:", openai.api_key)
 
@@ -28,7 +30,7 @@ Met Learnloop kun je de onderwerpen uit hoorcolleges op een effectieve manier le
 onderwerpen uit het hoorcollege haalt, deze aanvult en fact-checked met het boek en over die kennis flashcards maakt.
 
 Stappen:
-1. Login met je studentnummer en wachtwoord
+1. Login met je ontvangen username en wachtwoord
 2. Selecteer je vak
 3. Start met leren! 
 """

@@ -2,11 +2,13 @@ import json
 import random
 
 import streamlit as st
+import utils
 
 # st.title("Spaced Repetition Versions")
 # st.write("The pages below this page contain the same flashcards per week, but the quizzes use a spaced repetition algorithm that makes studying more effective. This way you can choose to use the learning style you prefer.")
 # st.markdown("Here's how it works: You rate the difficulty of a flashcard, and the algorithm organizes the deck so that **harder flashcards appear more frequently**. If you find a flashcard **easy two times in a row**, it's removed from the list and you will progress.")
 # st.markdown("IMPORTANT: Your **progress is not saved** and is therefore lost when you refresh the page or switch pages. It is the current limitation of the prototype and will be fixed in later versions.")
+
 
 def space_repetition_page(title, questions, answers):
     # Check if title is the same, else reset
@@ -266,20 +268,19 @@ def display_page(page_title, content):
         page_content = content[page_idx]
         space_repetition_page(page_content['title'], page_content['questions'], page_content['answers'])
 
+utils.init_session_state()
+if st.session_state["authentication_status"] is False or None:
+    st.warning('Please enter your credentials on the homepage')
+else:
+    # Load content from JSON
+    content = load_content()
+    pages = get_pages(content)
 
-
-# Load content from JSON
-content = load_content()
-pages = get_pages(content)
-
-# Loop through each option and create a button for it in the sidebar
-st.sidebar.header("Subjects")
-for option in pages:
-    if st.sidebar.button(option):
-        # Display the selected page and reset the state if needed
-        display_page(option, content)
-
-
-
+    # Loop through each option and create a button for it in the sidebar
+    st.sidebar.header("Subjects")
+    for option in pages:
+        if st.sidebar.button(option):
+            # Display the selected page and reset the state if needed
+            display_page(option, content)
 
 
