@@ -4,12 +4,38 @@ import streamlit as st
 from PIL import Image
 
 import utils
+import database
+client = database.init_connection(**st.secrets["mongo"])
+db = client.LearnLoop
 
 
 # st.title("Spaced Repetition Versions")
 # st.write("The pages below this page contain the same flashcards per week, but the quizzes use a spaced repetition algorithm that makes studying more effective. This way you can choose to use the learning style you prefer.")
 # st.markdown("Here's how it works: You rate the difficulty of a flashcard, and the algorithm organizes the deck so that **harder flashcards appear more frequently**. If you find a flashcard **easy two times in a row**, it's removed from the list and you will progress.")
 # st.markdown("IMPORTANT: Your **progress is not saved** and is therefore lost when you refresh the page or switch pages. It is the current limitation of the prototype and will be fixed in later versions.")
+
+def get_scores(name):
+    # Get progress object from database
+    progress = db.users.find_one({"username": name})["progress"]
+    st.session_state.progress = progress
+
+
+def upload_score(name, score, module):
+    # Update global progress state, check if it exists
+    st.session_state.progress[module] = score
+
+
+    # Check if user exists and update
+    if db.users.find_one({"username": name}):
+        print("User exists, updating score for " + name + " in " + module + " to " + str(score))
+        # Add scores to progress object, make object if does not exist
+        db.users.update_one({"username": name}, {
+            "$set": {
+                "progress." + module: score
+            }
+        })
+    else:
+        print("User does not exist, not updating score")
 
 def space_repetition_page(title, questions, answers):
     # Check if title is the same, else reset
@@ -105,7 +131,17 @@ def space_repetition_page(title, questions, answers):
 
     # Initialise progress bar
     progress_bar = st.progress(0)
-    progress_bar.progress(int(sum(st.session_state.easy_count.values()) / (2 * len(questions)) * 100))
+    progress = int(sum(st.session_state.easy_count.values()) / (2 * len(questions)) * 100)
+    progress_bar.progress(progress)
+    # Set session state to percentage
+    # st.session_state.progress = progress
+
+    # Set as percentage
+    if st.session_state['authentication_status'] == True and st.session_state['selected_module'] is not None:
+        upload_score(st.session_state['name'], progress, st.session_state['selected_module'])
+
+
+
 
     question_cont = st.container()
 
@@ -305,11 +341,14 @@ def load_content():
 
 # Create a list of possible pages based on the titles in the json file
 def get_pages(content):
+    print("Getting pages with scores:", st.session_state.progress)
+
     titles = [page['title'] for page in content]
 
-    # # Add percentages (for now just add random)
-    percentages = [10, 20, 30]
-    titles = [f"{title} ({percentage}%)" for title, percentage in zip(titles, percentages)]
+    # Add scores to titles
+    for i, title in enumerate(titles):
+        if title in st.session_state.progress:
+            titles[i] += " (" + str(st.session_state.progress[title]) + "%)"
 
     return titles
 
@@ -318,35 +357,48 @@ def get_pages(content):
 def display_page(page_title, content):
     page_title = page_title.split(" (")[0]
 
+    # Set selected module as session state
+    st.session_state.selected_module = page_title
+    print("Set selected module: ", st.session_state.selected_module)
+
     page_idx = next((index for (index, d) in enumerate(content) if d["title"] == page_title), None)
     if page_idx is not None:
         page_content = content[page_idx]
         space_repetition_page(page_content['title'], page_content['questions'], page_content['answers'])
 
-# Load content from JSON
-content = load_content()
-pages = get_pages(content)
 
-# Loop through each option and create a button for it in the sidebar
-st.sidebar.header("Subjects")
-for option in pages:
-    if st.sidebar.button(option):
-        # Display the selected page and reset the state if needed
-        display_page(option, content)
+## RENDERING
 
+utils.init_session_state()
 
-# utils.init_session_state()
-# if st.session_state["authentication_status"] is False or st.session_state["authentication_status"] is None:
-#     st.warning('Please enter your credentials on the homepage')
-# else:
-#     # Load content from JSON
-#     content = load_content()
-#     pages = get_pages(content)
-#
-#     # Loop through each option and create a button for it in the sidebar
-#     st.sidebar.header("Subjects")
-#     for option in pages:
-#         if st.sidebar.button(option):
-#             # Display the selected page and reset the state if needed
-#             display_page(option, content)
+if 'progress' not in st.session_state and st.session_state["authentication_status"] is True:
+    st.session_state.progress = []
+    get_scores(st.session_state['name'])
+
+# Init selected module
+if 'selected_module' not in st.session_state:
+    st.session_state.selected_module = None
+
+if 'pages' not in st.session_state:
+    st.session_state.pages = []
+
+if st.session_state["authentication_status"] is False or st.session_state["authentication_status"] is None:
+    st.warning('Please enter your credentials on the homepage')
+else:
+    # Load content from JSON
+    content = load_content()
+    st.session_state.pages = get_pages(content)
+
+    # Loop through each option and create a button for it in the sidebar
+    st.sidebar.header("Subjects")
+    for option in st.session_state.pages:
+        if st.sidebar.button(option):
+            # Display the selected page and reset the state if needed
+            display_page(option, content)
+        else:
+            print(st.session_state.selected_module)
+            if st.session_state.selected_module is None:
+                st.write("Welcome to our demo. Please select a subject on the left to get started.")
+            elif st.session_state.selected_module is not None:
+                display_page(st.session_state.selected_module, content)
 

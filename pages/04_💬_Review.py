@@ -27,7 +27,6 @@ def main():
         if st.button('Submit Review'):
             # Here you can add code to store the review in a database or a file
             # For now, it just displays a thank you message
-            # TODO: Upload to database
             client = database.init_connection(**st.secrets["mongo"])
             db = client.LearnLoop
             db.reviews.insert_one({"rating": rating, "review": review})
