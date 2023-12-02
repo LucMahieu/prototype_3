@@ -213,6 +213,13 @@ def space_repetition_page(title, questions, answers):
     if 'difficulty' not in st.session_state:
         st.session_state.difficulty = ""
 
+    def skip_cards():
+        st.session_state.questions.pop(0)
+        st.session_state.answers.pop(0)
+
+    # Skip questions
+    st.button("Skip", on_click=skip_cards)
+
     # Condition used to indicate if current question is infobit
     infobit = st.session_state.questions[0][0:8] == "Infobit:"
 
