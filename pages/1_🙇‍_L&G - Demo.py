@@ -45,9 +45,10 @@ def space_repetition_page(title, questions, answers):
         st.session_state.answers = answers
 
     def change_card_index(index):
-        # Select first element and re-insert at index
-        st.session_state.questions.insert(index, st.session_state.questions[0])
-        st.session_state.answers.insert(index, st.session_state.answers[0])
+        if index > -1:
+            # Select first element and re-insert at index
+            st.session_state.questions.insert(index, st.session_state.questions[0])
+            st.session_state.answers.insert(index, st.session_state.answers[0])
 
         # Delete the first duplicate card
         del st.session_state.questions[0]
@@ -120,8 +121,8 @@ def space_repetition_page(title, questions, answers):
     # st.session_state.progress = progress
 
     # Set as percentage
-    if st.session_state['authentication_status'] == True and st.session_state['selected_module'] is not None:
-        upload_score(st.session_state['name'], progress, st.session_state['selected_module'])
+    # if st.session_state['authentication_status'] == True and st.session_state['selected_module'] is not None:
+    #     upload_score(st.session_state['name'], progress, st.session_state['selected_module'])
 
 
 
@@ -136,6 +137,7 @@ def space_repetition_page(title, questions, answers):
         st.session_state.submitted = True
         st.session_state.score = score
         st.session_state.feedback = feedback
+        st.session_state.answer = input_text
 
     # Send to openai for validation
     from openai import OpenAI
@@ -147,9 +149,6 @@ def space_repetition_page(title, questions, answers):
         with open("./pages/system_role_prompt.txt", "r") as f:
             role_prompt = f.read()
 
-        print({"role": "system", "content": role_prompt},
-                {"role": "user", "content": prompt})
-
         response = client.chat.completions.create(
             model="gpt-4-1106-preview",
             messages=[
@@ -158,8 +157,6 @@ def space_repetition_page(title, questions, answers):
             ],
             max_tokens=300
         )
-
-        print(response)
 
         split_response = response.choices[0].message.content.split(";;")
 
@@ -250,7 +247,7 @@ def space_repetition_page(title, questions, answers):
             info, title, text = st.session_state.questions[0].split("//")
             st.subheader(title)
             st.write(text)
-        st.button('Next', use_container_width=True, on_click=change_card_index(100))
+        st.button('Next', use_container_width=True, on_click=change_card_index(-1))
         current_card = st.session_state.questions[0]
         if current_card in st.session_state.easy_count:
             st.session_state.easy_count[current_card] += 1
@@ -328,14 +325,12 @@ def load_content():
 
 # Create a list of possible pages based on the titles in the json file
 def get_pages(content):
-    print("Getting pages with scores:", st.session_state.progress)
-
     titles = [page['title'] for page in content]
 
-    # Add scores to titles
-    for i, title in enumerate(titles):
-        if title in st.session_state.progress:
-            titles[i] += " (" + str(st.session_state.progress[title]) + "%)"
+    # # Add scores to titles
+    # for i, title in enumerate(titles):
+    #     if title in st.session_state.progress:
+    #         titles[i] += " (" + str(st.session_state.progress[title]) + "%)"
 
     return titles
 
@@ -346,7 +341,6 @@ def display_page(page_title, content):
 
     # Set selected module as session state
     st.session_state.selected_module = page_title
-    print("Set selected module: ", st.session_state.selected_module)
 
     page_idx = next((index for (index, d) in enumerate(content) if d["title"] == page_title), None)
     if page_idx is not None:
@@ -361,8 +355,8 @@ utils.init_session_state()
 if 'progress' not in st.session_state:
     st.session_state.progress = []
 
-if len(st.session_state['progress']) == 0  and st.session_state["authentication_status"] is True:
-    get_scores(st.session_state['name'])
+# if len(st.session_state['progress']) == 0  and st.session_state["authentication_status"] is True:
+#     get_scores(st.session_state['name'])
 
 # Init selected module
 if 'selected_module' not in st.session_state:
@@ -406,7 +400,6 @@ else:
             # Display the selected page and reset the state if needed
             display_page(option, content)
         else:
-            print(st.session_state.selected_module)
             if st.session_state.selected_module is None:
                 st.warning("Select a module to get started.")
                 # st.write("Welcome to our demo. Please select a subject on the left to get started.")
