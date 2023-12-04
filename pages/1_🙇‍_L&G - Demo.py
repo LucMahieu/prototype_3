@@ -114,9 +114,8 @@ def space_repetition_page(title, questions, answers):
     st.markdown(progress_bar_style, unsafe_allow_html=True)
 
     # Initialise progress bar
-    progress_bar = st.progress(0)
     progress = int(sum(st.session_state.easy_count.values()) / (2 * len(questions)) * 100)
-    progress_bar.progress(progress)
+    progress_bar = st.progress(progress)
     # Set session state to percentage
     # st.session_state.progress = progress
 
@@ -292,11 +291,11 @@ def space_repetition_page(title, questions, answers):
 
         col1, col2, col3 = st.columns(3)
         with col1:
-            st.button('Easy', use_container_width=True, on_click=lambda: reset('easy'))
+            st.button('Got it', use_container_width=True, on_click=lambda: reset('easy'))
         with col2:
-            st.button('Medium', use_container_width=True, on_click=lambda: reset('medium'))
+            st.button('Getting closes', use_container_width=True, on_click=lambda: reset('medium'))
         with col3:
-            st.button('Hard', use_container_width=True, on_click=lambda: reset('hard'))
+            st.button('Some extra practice', use_container_width=True, on_click=lambda: reset('hard'))
 
         def toggle_answer():
             st.session_state.show_answer = not st.session_state.show_answer
