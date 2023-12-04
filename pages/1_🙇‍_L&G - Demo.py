@@ -176,7 +176,7 @@ def space_repetition_page(title, questions, answers):
         try:
             # Calculate the score percentage
             part, total = st.session_state.score.split('/')
-            score_percentage = int(part) / int(total)
+            score_percentage = float(part) / float(total)
         except ValueError:
             score_percentage = 0
 
@@ -259,10 +259,14 @@ def space_repetition_page(title, questions, answers):
     else:
         # Display the submitted text as solid text
         st.write("Your answer:")
+        st.write("test")
         st.write(st.session_state.answer)
 
     # After submission, display the result
     if st.session_state.submitted:
+
+        with question_cont:
+            st.subheader(st.session_state.questions[0])
 
         # Display the feedback
         display_result()
