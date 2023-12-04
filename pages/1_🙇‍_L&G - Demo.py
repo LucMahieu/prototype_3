@@ -292,7 +292,7 @@ def space_repetition_page(title, questions, answers):
         with col1:
             st.button('Got it', use_container_width=True, on_click=lambda: reset('easy'))
         with col2:
-            st.button('Getting closes', use_container_width=True, on_click=lambda: reset('medium'))
+            st.button('Getting closer', use_container_width=True, on_click=lambda: reset('medium'))
         with col3:
             st.button('Some extra practice', use_container_width=True, on_click=lambda: reset('hard'))
 
