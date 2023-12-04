@@ -45,9 +45,10 @@ def space_repetition_page(title, questions, answers):
         st.session_state.answers = answers
 
     def change_card_index(index):
-        # Select first element and re-insert at index
-        st.session_state.questions.insert(index, st.session_state.questions[0])
-        st.session_state.answers.insert(index, st.session_state.answers[0])
+        if index > -1:
+            # Select first element and re-insert at index
+            st.session_state.questions.insert(index, st.session_state.questions[0])
+            st.session_state.answers.insert(index, st.session_state.answers[0])
 
         # Delete the first duplicate card
         del st.session_state.questions[0]
@@ -246,7 +247,7 @@ def space_repetition_page(title, questions, answers):
             info, title, text = st.session_state.questions[0].split("//")
             st.subheader(title)
             st.write(text)
-        st.button('Next', use_container_width=True, on_click=change_card_index(100))
+        st.button('Next', use_container_width=True, on_click=change_card_index(-1))
         current_card = st.session_state.questions[0]
         if current_card in st.session_state.easy_count:
             st.session_state.easy_count[current_card] += 1
