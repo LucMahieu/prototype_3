@@ -274,6 +274,7 @@ def space_repetition_page(title, questions, answers):
             # st.session_state.questions.pop(0)
             # st.session_state.answers.pop(0)
 
+        st.write('Hoe moeilijk vond je deze vraag?')
         col1, col2, col3 = st.columns(3)
         with col1:
             st.button('Easy', use_container_width=True, on_click=lambda: reset('easy'))
@@ -297,6 +298,9 @@ def space_repetition_page(title, questions, answers):
             st.session_state.easy_count = {}
 
         # st.button('Next question >', on_click=reset)
+    st.markdown('<div style="height: 150px;"></div>', unsafe_allow_html=True)  # Add five empty lines
+
+    st.text_area("**Feedback** over verbeteringen voor het leertraject.", placeholder="Bijvoorbeeld: \n- 'Ik wil de optie om meer informatie te krijgen over een concept.'\n- 'De vraag is te vaag.'")
 
 # ====================
 
