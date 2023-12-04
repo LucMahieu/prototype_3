@@ -255,7 +255,6 @@ def space_repetition_page(title, questions, answers):
     else:
         # Display the submitted text as solid text
         st.write("Your answer:")
-        st.write("test")
         st.write(st.session_state.answer)
 
     # After submission, display the result
