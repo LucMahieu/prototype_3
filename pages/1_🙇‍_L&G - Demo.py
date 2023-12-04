@@ -64,22 +64,14 @@ def space_repetition_page(title, questions, answers):
 
         # Delete card if graduated
         if st.session_state.easy_count[current_card] >= 2:
-            del st.session_state.questions[0]
-            del st.session_state.answers[0]
+            del st.session_state.indices[0]  # Remove the index of the graduated card
         else:
-            change_card_index(20)
-
-        return
+            change_card_index(20)  # Adjust this value as needed
 
 
     def reset_easy_count(current_card):
         st.session_state.easy_count[current_card] = 0
 
-
-    # -------------------------SESSION STATES----------------------------- #
-
-
-    # -------------------------------MAIN---------------------------------- #
     def initialise_new_page():
         st.session_state.questions = questions.copy()
         st.session_state.answers = answers.copy()
@@ -117,7 +109,7 @@ def space_repetition_page(title, questions, answers):
     progress = int(sum(st.session_state.easy_count.values()) / (2 * len(questions)) * 100)
     progress_bar = st.progress(progress)
     # Set session state to percentage
-    # st.session_state.progress = progress
+    st.session_state.progress = progress
 
     # Set as percentage
     # if st.session_state['authentication_status'] == True and st.session_state['selected_module'] is not None:
@@ -173,48 +165,29 @@ def space_repetition_page(title, questions, answers):
             # Calculate the score percentage
             part, total = st.session_state.score.split('/')
             score_percentage = float(part) / float(total)
-        except ValueError:
-            score_percentage = 0
+        except Exception as e:
+            st.error(f"Error calculating score: {e}")
+            return  # Early exit on error
 
-        # Give rgba with 0.2 opacity
+        # Determine color based on score percentage
         if score_percentage > 0.75:
-            # Green
-            color = 'rgba(0, 128, 0, 0.2)'
+            color = 'rgba(0, 128, 0, 0.2)'  # Green
         elif score_percentage > 0.49:
-            # Orange
-            color = 'rgba(255, 165, 0, 0.2)'
+            color = 'rgba(255, 165, 0, 0.2)'  # Orange
         else:
-            # Red
-            color = 'rgba(255, 0, 0, 0.2)'
+            color = 'rgba(255, 0, 0, 0.2)'  # Red
 
-        # Each element corresponds to a new line
-        feedback_lines = ["", "", "", "", "", "", "", ""]
-        for i in range(len(st.session_state.feedback)):
-            feedback_lines[i] = st.session_state.feedback[i]
+        # Generate feedback paragraphs
+        feedback_html = ''.join(
+            f"<p style='font-size: 20px; margin: 10px 0;'>{line}</p>" for line in st.session_state.feedback if
+            line.strip())
 
         result_html = f"""
         <div style='background-color: {color}; padding: 25px; margin-bottom: 20px; border-radius: 8px;'>
-            <h1 style='font-size: 30px; margin: 0;'>{st.session_state.score}</h1>
-            <p style='font-size: 20px; margin: 0;'>{feedback_lines[0]}</p>
-            <p style='font-size: 20px; margin: 0;'>{feedback_lines[1]}</p>
-            <p style='font-size: 20px; margin: 0;'>{feedback_lines[2]}</p>
-            <p style='font-size: 20px; margin: 0;'>{feedback_lines[3]}</p>
-            <p style='font-size: 20px; margin: 0;'>{feedback_lines[4]}</p>     
-            <p style='font-size: 20px; margin: 0;'>{feedback_lines[5]}</p>     
-            <p style='font-size: 20px; margin: 0;'>{feedback_lines[6]}</p>
-            <p style='font-size: 20px; margin: 0;'>{feedback_lines[7]}</p>
+            <h1 style='font-size: 30px; margin-bottom: 15px;'>{st.session_state.score}</h1>
+            {feedback_html}
         </div>
         """
-
-        # Displaying score and feedback with formatting within the div
-        # formatted_feedback = [f"<p style='font-size: 20px; font-style: italic; margin: 0;'>{f}</p>" for f in st.session_state.feedback]
-
-        # result_html = f"""
-        # <div style='background-color: {color}; padding: 25px; margin-bottom: 10px; border-radius: 5px;'>
-        #     <h1 style='font-size: 30px; margin: 0;'>{st.session_state.score}</h1>
-        #     {''.join(formatted_feedback)}
-        # </div>
-        # """
 
         st.markdown(result_html, unsafe_allow_html=True)
 
@@ -310,6 +283,12 @@ def space_repetition_page(title, questions, answers):
             st.session_state.answers = answers.copy()
             st.session_state.easy_count = {}
 
+        # Displaying the question and answer
+        if st.session_state.indices:
+            current_index = st.session_state.indices[0]
+            current_question = st.session_state.questions[current_index]
+            current_answer = st.session_state.answers[current_index]
+
         # st.button('Next question >', on_click=reset)
 
 # ====================
@@ -325,10 +304,10 @@ def load_content():
 def get_pages(content):
     titles = [page['title'] for page in content]
 
-    # # Add scores to titles
-    # for i, title in enumerate(titles):
-    #     if title in st.session_state.progress:
-    #         titles[i] += " (" + str(st.session_state.progress[title]) + "%)"
+    # Add scores to titles
+    for i, title in enumerate(titles):
+        if title in st.session_state.progress:
+            titles[i] += " (" + str(st.session_state.progress[title]) + "%)"
 
     return titles
 
@@ -353,8 +332,8 @@ utils.init_session_state()
 if 'progress' not in st.session_state:
     st.session_state.progress = []
 
-# if len(st.session_state['progress']) == 0  and st.session_state["authentication_status"] is True:
-#     get_scores(st.session_state['name'])
+if len(st.session_state['progress']) == 0  and st.session_state["authentication_status"] is True:
+    get_scores(st.session_state['name'])
 
 # Init selected module
 if 'selected_module' not in st.session_state:
