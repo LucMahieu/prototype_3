@@ -15,30 +15,15 @@ from langchain.vectorstores import FAISS
 from langchain.chains import RetrievalQA
 
 import database
+import utils
 
 load_dotenv()
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 print("Starting up with API KEY:", openai.api_key)
 
-st.title("Learnloop")
-"""
-Met Learnloop kun je de onderwerpen uit hoorcolleges op een effectievere manier leren doordat Learnloop automatisch de 
-onderwerpen uit het hoorcollege haalt, deze aanvult en fact-checked met het boek en over die kennis flashcards maakt.
+st.set_page_config(page_title="LearnLoop", layout="centered")
+st.title("🎓 LearnLoop")
 
-Stappen:
-1. Upload je slides van een hoorcollege.
-2. Upload het boek dat hoort bij het vak.
-3. De slides worden automatisch omgezet tot flashcards. ***De verwerking hiervan kan enkele minuten duren.***
-4. Onderaan de pagina kun je de flashcards downloaden om in ANKI te zetten.
-"""
-
-main_container = st.container()
-sub_container = st.container()
-sub_container2 = st.container()
-
-slide_upload = st.file_uploader("Upload hoorcollegeslides", type='pdf')
-book_upload = st.file_uploader("Upload boek", type='pdf')
-llm3 = ChatOpenAI(model_name="gpt-4-1106-preview")
 
 def pdf_reader(uploaded_pdf):
     reader = PdfReader(uploaded_pdf)
@@ -276,7 +261,30 @@ def clean_topics(text):
             lines_cleaned.append(line)
     return lines_cleaned
 
-if __name__ == '__main__':
+utils.init_session_state()
+
+if st.session_state["authentication_status"] is not 'admin':
+    st.warning('You are not an admin.')
+else:
+    """
+    Met Learnloop kun je de onderwerpen uit hoorcolleges op een effectievere manier leren doordat Learnloop automatisch de 
+    onderwerpen uit het hoorcollege haalt, deze aanvult en fact-checked met het boek en over die kennis flashcards maakt.
+
+    Stappen:
+    1. Upload je slides van een hoorcollege.
+    2. Upload het boek dat hoort bij het vak.
+    3. De slides worden automatisch omgezet tot flashcards. ***De verwerking hiervan kan enkele minuten duren.***
+    4. Onderaan de pagina kun je de flashcards downloaden om in ANKI te zetten.
+    """
+
+    main_container = st.container()
+    sub_container = st.container()
+    sub_container2 = st.container()
+
+    slide_upload = st.file_uploader("Upload hoorcollegeslides", type='pdf')
+    book_upload = st.file_uploader("Upload boek", type='pdf')
+    llm3 = ChatOpenAI(model_name="gpt-4-1106-preview")
+
     if slide_upload is not None:
         current_pdf_name = slide_upload.name[:-4]
         if 'previous_pdf_name' not in st.session_state:
@@ -347,21 +355,3 @@ if __name__ == '__main__':
 
             with col3:
                 next_button = st.button("Next", on_click=increment_counter, args=(1,))
-
-
-@st.cache_data(ttl=600)
-def get_data():
-    client = database.init_connection(**st.secrets["mongo"])
-    db = client.LearnLoop
-    # List  all collections
-    print(db.list_collection_names())
-    items = db.users.find()
-    # Unpack MongoDB cursor into list.
-    items = list(items)  # make hashable for st.cache_data
-    return items
-
-items = get_data()
-
-# Print results.
-for item in items:
-    st.write(f"{item}")
