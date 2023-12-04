@@ -20,7 +20,6 @@ import utils
 load_dotenv()
 utils.init_session_state()
 openai.api_key = st.secrets["OPENAI_API_KEY"]
-print("Starting up with API KEY:", openai.api_key)
 
 st.set_page_config(page_title="LearnLoop", layout="centered")
 st.title("🎓 LearnLoop")
