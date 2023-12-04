@@ -77,23 +77,6 @@ def space_repetition_page(title, questions, answers):
 
     # -------------------------SESSION STATES----------------------------- #
 
-    if 'easy_count' not in st.session_state:
-        st.session_state.easy_count = {}
-
-    if 'questions' not in st.session_state:
-        st.session_state.questions = None
-
-    if 'answers' not in st.session_state:
-        st.session_state.answers = None
-
-    if 'show_answer' not in st.session_state:
-        st.session_state.show_answer = False
-
-    if 'previous_page_name' not in st.session_state:
-        st.session_state.previous_page_name = None
-
-    if 'current_page_name' not in st.session_state:
-        st.session_state.current_page_name = __file__
 
     # -------------------------------MAIN---------------------------------- #
     def initialise_new_page():
@@ -371,8 +354,10 @@ def display_page(page_title, content):
 
 utils.init_session_state()
 
-if 'progress' not in st.session_state and st.session_state["authentication_status"] is True:
+if 'progress' not in st.session_state:
     st.session_state.progress = []
+
+if len(st.session_state['progress']) == 0  and st.session_state["authentication_status"] is True:
     get_scores(st.session_state['name'])
 
 # Init selected module
@@ -381,6 +366,27 @@ if 'selected_module' not in st.session_state:
 
 if 'pages' not in st.session_state:
     st.session_state.pages = []
+
+if 'easy_count' not in st.session_state:
+    st.session_state.easy_count = {}
+
+if 'questions' not in st.session_state:
+    st.session_state.questions = None
+
+if 'answers' not in st.session_state:
+    st.session_state.answers = None
+
+if 'show_answer' not in st.session_state:
+    st.session_state.show_answer = False
+
+if 'previous_page_name' not in st.session_state:
+    st.session_state.previous_page_name = None
+
+if 'current_page_name' not in st.session_state:
+    st.session_state.current_page_name = __file__
+
+
+
 
 if st.session_state["authentication_status"] is False or st.session_state["authentication_status"] is None:
     st.warning('Please enter your credentials on the homepage')

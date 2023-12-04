@@ -10,10 +10,6 @@ def main():
     st.write("We are very curious how this tool helps you study better. Please leave your review below. Feel free to write as much as you want!")
     st.write("**Note:** Your review will be fully anonymous.")
 
-    # Initialize the session state variable
-    if 'submitted' not in st.session_state:
-        st.session_state['submitted'] = False
-
     # Rating
     rating = st.slider("Rate your experience (1-5):", 1, 5, 1)
 
@@ -39,6 +35,10 @@ def clear_form():
     st.session_state['text_area'] = ""
 
 if __name__ == "__main__":
+    # Initialize the session state variable
+    if 'submitted' not in st.session_state:
+        st.session_state['submitted'] = False
+
     utils.init_session_state()
 
     if st.session_state["authentication_status"] is False or st.session_state["authentication_status"] is None:

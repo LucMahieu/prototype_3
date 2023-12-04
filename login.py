@@ -4,6 +4,7 @@ import streamlit_authenticator as stauth
 import database
 
 def login_module():
+
     @st.cache_data(ttl=600)
     def get_data():
         client = database.init_connection(**st.secrets["mongo"])
