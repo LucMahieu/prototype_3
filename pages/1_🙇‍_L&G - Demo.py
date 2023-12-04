@@ -400,7 +400,7 @@ else:
     st.session_state.pages = get_pages(content)
 
     # Loop through each option and create a button for it in the sidebar
-    st.sidebar.header("Subjects")
+    st.sidebar.header("Modules")
     for option in st.session_state.pages:
         if st.sidebar.button(option):
             # Display the selected page and reset the state if needed
@@ -408,7 +408,8 @@ else:
         else:
             print(st.session_state.selected_module)
             if st.session_state.selected_module is None:
-                st.write("Welcome to our demo. Please select a subject on the left to get started.")
+                st.warning("Select a module to get started.")
+                # st.write("Welcome to our demo. Please select a subject on the left to get started.")
             elif st.session_state.selected_module is not None:
                 display_page(st.session_state.selected_module, content)
 
