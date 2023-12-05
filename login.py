@@ -23,8 +23,6 @@ def login_module():
             item["name"] = item.pop("username")
             item["password"] = item.pop("password")
 
-        print(items)
-
         return items
 
     items = get_data()
