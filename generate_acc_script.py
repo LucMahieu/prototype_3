@@ -7,6 +7,8 @@ from streamlit_authenticator.hasher import Hasher
 import database
 
 
+AMOUNT_OF_ACCOUNTS = 10
+
 def generate_account_names_and_passwords_v2(num_accounts, password_length):
     accounts = []
     possible_names = ['banana', 'apple', 'tree', 'river', 'mountain', 'flower', 'sky', 'ocean', 'forest', 'stone']
@@ -23,7 +25,7 @@ def generate_account_names_and_passwords_v2(num_accounts, password_length):
     return accounts
 
 # Generate 10 accounts with passwords of length 8
-accounts_v2 = generate_account_names_and_passwords_v2(11, 8)
+accounts_v2 = generate_account_names_and_passwords_v2(AMOUNT_OF_ACCOUNTS, 8)
 
 # Upload accounts
 client = database.init_connection(**st.secrets["mongo"])
