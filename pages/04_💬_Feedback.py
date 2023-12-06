@@ -6,7 +6,7 @@ import time
 
 
 def main():
-    st.title("Deel Je Feedback & Gedachten")
+    st.title("Feedback & Suggesties")
     
     st.write("We zijn erg benieuwd of deze tool je helpt beter te studeren, en we horen vooral graag jouw ideeën over hoe het verbeterd kan worden. Voel je vrij om zoveel te schrijven als je wilt!")
     st.write("Deel **alle feedback** die je hebt (volledig anoniem):")
