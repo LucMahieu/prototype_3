@@ -13,7 +13,7 @@ def main():
 
 
     # Feedback
-    review = st.text_area("")
+    review = st.text_area("", placeholder="Bijvoorbeeld:\nHet laden van de directe feedback duurt te lang.\nMisschien is het een idee om de feedback in de achtergrond te laden en later terug te laten komen.")
 
     # Submit button
     if st.session_state['submitted']:
