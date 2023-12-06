@@ -13,7 +13,7 @@ def main():
 
 
     # Feedback
-    review = st.text_area()
+    review = st.text_area("")
 
     # Submit button
     if st.session_state['submitted']:
