@@ -26,18 +26,19 @@ st.title("🎓 LearnLoop")
 st.subheader("Bèta Prototype")
 
 """
-Met de uiteindelijke versie van LearnLoop kun je de stof uit de hoorcolleges op een effectieve manier leren doordat LearnLoop automatisch de 
-onderwerpen uit de hoorcolleges haalt, deze aanvult en fact-checked met het boek en over die kennis een interactief, gepersonaliseerd
-en adaptief leertraject maakt.
+Wat goed dat je het prototype gaat testen! Jouw feedback is waardevol en gaan we gebruiken om LearnLoop te verbeteren. Het is het eerste prototype waarmee we het leertraject en de directe feedback functie willen testen. We zijn benieuwd hoe je deze manier van studeren ervaart en vooral wat er beter aan kan! Je kunt al je feedback direct anoniem met ons delen via de '💬 Feedback' pagina.
 
-Dit is het eerste prototype en het doel hiervan is om te testen of directe feedback op je antwoorden waarde toevoegt aan je studeerervaring. 
-Met jouw feedback gaan we het prototype verbeteren en nieuwe functionaliteiten toevoegen zodat het uiteindelijk een volledig interactief, 
-gepersonaliseerd en adaptief leertraject wordt waarmee je op een veel leukere en effectievere manier kunt studeren.
+Het langetermijndoel is dat LearnLoop automatisch de onderwerpen uit de hoorcolleges en andere studiematerialen haalt, deze aanvult en fact-checked met het boek en over die kennis een interactief, gepersonaliseerd en adaptief leertraject maakt.
+
+Maar voor nu zijn we vooral benieuwd naar jouw ervaring en je suggesties voor veranderingen!
 
 Stappen:
-1. Login met je ontvangen gebruikersnaam en wachtwoord
-2. Selecteer je vak
-3. Start met leren!
+1. **Inloggen:** Gebruik de gegeven gebruikersnaam en wachtwoord.
+2. **Kies Leertraject:** 'Leren en Geheugen' en het hoorcollege.
+3. **Studeren & Feedback:** Volg het leertraject en geef tussentijds feedback.
+4. **Feedback Formulier:** Laat je mening achter via de formulieren aan het einde.
+
+Alvast heel erg bedankt en succes met studeren!
 """
 
 ## Load login page
