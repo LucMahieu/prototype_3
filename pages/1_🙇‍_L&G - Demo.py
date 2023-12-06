@@ -305,8 +305,8 @@ def space_repetition_page(title, questions, answers):
 
     if len(st.session_state.indices) > 0:
         # RENDER COMPONENTS
-        question_cont = st.container()
         render_progress_bar()
+        question_cont = st.container()
         render_question()
 
         # After submission, display the result
