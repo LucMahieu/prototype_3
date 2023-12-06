@@ -9,11 +9,10 @@ def main():
     st.title("Feedback & Suggesties")
     
     st.write("We zijn erg benieuwd of deze tool je helpt beter te studeren, en we horen vooral graag jouw ideeën over hoe het verbeterd kan worden. Voel je vrij om zoveel te schrijven als je wilt!")
-    st.write("Deel **alle feedback** die je hebt (volledig anoniem):")
 
 
     # Feedback
-    review = st.text_area("", placeholder="Bijvoorbeeld:\nHet laden van de directe feedback duurt te lang.\nMisschien is het een idee om de feedback in de achtergrond te laden en later terug te laten komen.")
+    review = st.text_area("Deel **alle feedback** die je hebt (volledig anoniem):", placeholder="Bijvoorbeeld:\nHet laden van de directe feedback duurt te lang.\nMisschien is het een idee om de feedback in de achtergrond te laden en later terug te laten komen.")
 
     # Submit button
     if st.session_state['submitted']:
