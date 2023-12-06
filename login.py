@@ -43,7 +43,7 @@ def login_module():
     authenticator.login('Login', 'main')
 
     if st.session_state["authentication_status"]:
-        st.write(f'Welcome *{st.session_state["name"]}*, you are now logged in. \n We will register your progress for you, good luck studying!')
+        st.write(f'Welkom *{st.session_state["name"]}*, je bent nu ingelogd. \n Hiermee houden we jouw vooruitgang bij, veel succes met studeren!')
         authenticator.logout('Or log out...', 'main', key='unique_key')
     elif st.session_state["authentication_status"] is False:
         st.error('Username/password is incorrect')
