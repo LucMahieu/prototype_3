@@ -19,6 +19,7 @@ def main():
         st.success("Bedankt voor je feedback!")
         time.sleep(5)
         st.session_state['submitted'] = False
+        st.experimental_rerun()
     if not st.session_state['submitted']:
         if st.button('Submit Feedback'):
             # Here you can add code to store the review in a database or a file
