@@ -22,7 +22,9 @@ def get_progress(name, module, questions):
     # Get progress object from database
     user_doc = db.users.find_one({"username": name})
 
-    if user_doc is not None and "progress" in user_doc:
+    print(f"Looking for progress.{module}")
+
+    if user_doc is not None and "progress" in user_doc and module in user_doc["progress"]:
         # User found and has a progress field
         progress = user_doc["progress"][module]
 
@@ -69,7 +71,7 @@ def space_repetition_page(title, questions, answers):
 
         if index > -1:
             # Insert at given index
-            st.session_state.indices.insert(index, st.session_state.indices.pop(0))
+            st.session_state.indices.insert(index, card_idx)
 
     def evaluate_graduation(current_card):
         if current_card in st.session_state.easy_count:
@@ -77,10 +79,13 @@ def space_repetition_page(title, questions, answers):
         else:
             st.session_state.easy_count[current_card] = 1
 
+        print("Current count: " + str(st.session_state.easy_count[current_card]) + " for card " + str(current_card))
         # Delete card if graduated
         if st.session_state.easy_count[current_card] >= 2:
             st.session_state.indices.pop(0) # Remove the index of the graduated card
         else:
+            # Move card to back of deck
+            print("Moving card to back of deck")
             change_card_index(20)  # Adjust this value as needed
 
     def reset_easy_count(current_card):
@@ -155,7 +160,10 @@ def space_repetition_page(title, questions, answers):
         try:
             # Calculate the score percentage
             part, total = st.session_state.score.split('/')
-            score_percentage = float(part) / float(total)
+            if total == '0':
+                score_percentage = 0
+            else:
+                score_percentage = float(part) / float(total)
         except Exception as e:
             st.error(f"Error calculating score: {e}")
             return  # Early exit on error
@@ -202,14 +210,15 @@ def space_repetition_page(title, questions, answers):
         st.markdown(progress_bar_style, unsafe_allow_html=True)
 
         # Initialise progress bar
-        progress = int(sum(st.session_state.easy_count.values()) / (2 * len(questions)) * 100)
+        if len(questions) > 0:
+            progress = int(sum(st.session_state.easy_count.values()) / (2 * len(questions)) * 100)
+        else:
+            progress = 0
         st.progress(progress)
         st.session_state.progress = progress
 
     def render_question():
-        current_index = st.session_state.indices[0]
         current_question = st.session_state.questions[st.session_state.indices[0]]
-        current_answer = st.session_state.answers[st.session_state.indices[0]]
 
         # Condition used to indicate if current question is infobit
         infobit = current_question[0:8] == "Infobit:"
@@ -229,12 +238,10 @@ def space_repetition_page(title, questions, answers):
                 st.subheader(title)
                 st.write(text)
             st.button('Next', use_container_width=True, on_click=change_card_index(-1))
-            if current_index in st.session_state.easy_count:
-                st.session_state.easy_count[current_index] += 1
-            else:
-                st.session_state.easy_count[current_index] = 1
         else:
             # Display the submitted text as solid text
+            with question_cont:
+                st.subheader(current_question)
             st.write("Your answer:")
             st.write(st.session_state.answer)
 
@@ -252,8 +259,12 @@ def space_repetition_page(title, questions, answers):
             st.session_state.show_answer = not st.session_state.show_answer
         st.button('Explanation', use_container_width=True, on_click=toggle_answer)
 
+        print(st.session_state.show_answer)
+        print(st.session_state.indices[0])
+        print(st.session_state.answers)
+        print(st.session_state.answers[st.session_state.indices[0]])
         if st.session_state.show_answer:
-            st.markdown(st.session_state.answers[st.session_state.indices[0]], unsafe_allow_html=True)
+            st.markdown(st.session_state.answers[st.session_state.indices[0]])
 
 
     # -- Construct page
@@ -280,7 +291,7 @@ def space_repetition_page(title, questions, answers):
         if 'difficulty' not in st.session_state:
             st.session_state.difficulty = ""
 
-    # print("Rendering with session state: ", st.session_state.indices, st.session_state.easy_count)
+    print("Rendering with session state: ", st.session_state.indices, st.session_state.easy_count)
 
     # Read and store current file name
     st.session_state.current_page_name = __file__
@@ -291,36 +302,32 @@ def space_repetition_page(title, questions, answers):
         initialise_new_page()
         st.session_state.previous_page_name = st.session_state.current_page_name
 
-
-    # RENDER COMPONENTS
-    question_cont = st.container()
-    render_progress_bar()
-    render_question()
-
-    # Set as percentage
-    # if st.session_state['authentication_status'] == True and st.session_state['selected_module'] is not None:
-    #     upload_score(st.session_state['name'], progress, st.session_state['selected_module'])
-
-    # After submission, display the result
-    if st.session_state.submitted:
-
-        with question_cont:
-            st.subheader(st.session_state.current_question)
-
-        # Display the feedback
-        display_result()
-        render_next_buttons()
-        render_explanation()
-
-        # Restart card carousel when deck is emptied (reset deck)
-        if len(st.session_state.indices) == 0:
+    if len(st.session_state.indices) == 0:
+        st.write("You completed this deck, well done! 🎉")
+        st.write("Please provide some feedback on your experience via the sidebar.")
+        # Restart button
+        if st.button('Reset deck'):
             st.session_state.questions = questions.copy()
             st.session_state.answers = answers.copy()
             st.session_state.easy_count = {}
             st.session_state.indices = list(range(len(questions)))
+            # Trigger full rerender
+            st.rerun()
+
+    if len(st.session_state.indices) > 0:
+        # RENDER COMPONENTS
+        question_cont = st.container()
+        render_progress_bar()
+        render_question()
+
+        # After submission, display the result
+        if st.session_state.submitted:
+            # Display the feedback
+            display_result()
+            render_next_buttons()
+            render_explanation()
 
 # ====================
-
 
 # Function to load content from JSON file
 def load_content():
@@ -360,6 +367,9 @@ utils.init_session_state()
 # if 'progress' not in st.session_state:
 #     st.session_state.progress = 0
 
+if 'answer' not in st.session_state:
+    st.session_state.answer = ""
+
 # Init selected module
 if 'selected_module' not in st.session_state:
     st.session_state.selected_module = None
@@ -390,26 +400,28 @@ if 'current_page_name' not in st.session_state:
 
 
 
+# Function to handle authentication check
+def check_authentication():
+    if st.session_state["authentication_status"] is False or st.session_state["authentication_status"] is None:
+        st.warning('Please enter your credentials on the homepage')
+        return False
+    return True
 
-
-
-if st.session_state["authentication_status"] is False or st.session_state["authentication_status"] is None:
-    st.warning('Please enter your credentials on the homepage')
-else:
-    # Load content from JSON
+# Main logic
+if check_authentication():
     content = load_content()
     st.session_state.pages = get_pages(content)
 
-    # Loop through each option and create a button for it in the sidebar
+    # Module options
     st.sidebar.header("Modules")
     for option in st.session_state.pages:
         if st.sidebar.button(option):
-            # Display the selected page and reset the state if needed
-            display_page(option, content)
-        else:
-            if st.session_state.selected_module is None:
-                st.warning("Select a module to get started.")
-                # st.write("Welcome to our demo. Please select a subject on the left to get started.")
-            elif st.session_state.selected_module is not None:
-                display_page(st.session_state.selected_module, content)
+            st.session_state.selected_module = option
 
+            # display_page(option, content)
+
+    # Display correct module
+    if st.session_state.selected_module is None:
+        st.write("Welcome! Please select a module to get started.")
+    else:
+        display_page(st.session_state.selected_module, content)
