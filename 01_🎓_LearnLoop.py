@@ -32,7 +32,7 @@ Het langetermijndoel is dat LearnLoop automatisch de onderwerpen uit de hoorcoll
 
 Maar voor nu zijn we vooral benieuwd naar jouw ervaring en je suggesties voor veranderingen!
 
-####**Stappen:**
+**Stappen:**
 1. **Inloggen:** Gebruik de gegeven gebruikersnaam en wachtwoord.
 2. **Kies Leertraject:** 'Leren en Geheugen' en het hoorcollege.
 3. **Studeren & Feedback:** Volg het leertraject en geef tussentijds feedback.
