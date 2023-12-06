@@ -18,11 +18,9 @@ client = OpenAI()
 # st.markdown("IMPORTANT: Your **progress is not saved** and is therefore lost when you refresh the page or switch pages. It is the current limitation of the prototype and will be fixed in later versions.")
 
 def get_progress(name, module, questions):
-    print("Getting progress for " + name)
     # Get progress object from database
     user_doc = db.users.find_one({"username": name})
 
-    print(f"Looking for progress.{module}")
 
     if user_doc is not None and "progress" in user_doc and module in user_doc["progress"]:
         # User found and has a progress field
@@ -38,16 +36,12 @@ def get_progress(name, module, questions):
         return {'indices': list(range(len(questions))), 'easy_count': {}}
 
 def upload_progress(name, indices, easy_count, module):
-    print("Uploading progress for " + name + " in " + module)
     # Update global progress state, check if it exists
     # st.session_state.indices = indices
     # st.session_state.easy_count = easy_count
 
     # Check if user exists and update
     if db.users.find_one({"username": name}):
-        print("User exists, updating progress for " + name + " in " + module + " to " + str(indices) + " and " + str(
-            easy_count))
-
         # Easy count dict to string keys only
         easy_count = {str(k): v for k, v in easy_count.items()}
 
@@ -79,13 +73,11 @@ def space_repetition_page(title, questions, answers):
         else:
             st.session_state.easy_count[current_card] = 1
 
-        print("Current count: " + str(st.session_state.easy_count[current_card]) + " for card " + str(current_card))
         # Delete card if graduated
         if st.session_state.easy_count[current_card] >= 2:
             st.session_state.indices.pop(0) # Remove the index of the graduated card
         else:
             # Move card to back of deck
-            print("Moving card to back of deck")
             change_card_index(20)  # Adjust this value as needed
 
     def reset_easy_count(current_card):
@@ -260,10 +252,6 @@ def space_repetition_page(title, questions, answers):
             st.session_state.show_answer = not st.session_state.show_answer
         st.button('Explanation', use_container_width=True, on_click=toggle_answer)
 
-        print(st.session_state.show_answer)
-        print(st.session_state.indices[0])
-        print(st.session_state.answers)
-        print(st.session_state.answers[st.session_state.indices[0]])
         if st.session_state.show_answer:
             st.markdown(st.session_state.answers[st.session_state.indices[0]])
 
