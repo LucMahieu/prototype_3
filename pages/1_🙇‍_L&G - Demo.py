@@ -211,7 +211,8 @@ def space_repetition_page(title, questions, answers):
 
         # Initialise progress bar
         if len(questions) > 0:
-            progress = int(sum(st.session_state.easy_count.values()) / (2 * len(questions)) * 100)
+            # progress = int(sum(st.session_state.easy_count.values()) / (2 * len(questions)) * 100) # Does not work anymore due to infobits
+            progress = 100 - int((len(st.session_state.indices) / len(questions)) * 100)
         else:
             progress = 0
         st.progress(progress)
@@ -291,7 +292,7 @@ def space_repetition_page(title, questions, answers):
         if 'difficulty' not in st.session_state:
             st.session_state.difficulty = ""
 
-    print("Rendering with session state: ", st.session_state.indices, st.session_state.easy_count)
+    # print("Rendering with session state: ", st.session_state.indices, st.session_state.easy_count)
 
     # Read and store current file name
     st.session_state.current_page_name = __file__

@@ -112,6 +112,11 @@
     "De fysiologische toestand beïnvloedt het geheugen doordat specifieke leerervaringen beter opgehaald kunnen worden wanneer men zich in een vergelijkbare fysiologische toestand bevindt als tijdens het leren (1 punt).",
     ""
       ]
+    },
+    {
+      "title": "Test",
+      "questions": ["Infobit://I1//","A1", "Infobit://I2//", "A2"],
+      "answers": ["","B1", "", "B2"]
     }
   ]
 }
