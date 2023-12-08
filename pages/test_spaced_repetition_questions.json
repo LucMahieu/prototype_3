@@ -263,5 +263,30 @@
                 "infobit": 1
             }
         ]
+    },
+    {
+        "title": "Test",
+        "segments": [
+            {
+                "question": "Infobit://I1//",
+                "answer": "",
+                "infobit": 1
+            },
+            {
+                "question": "A1",
+                "answer": "B1",
+                "infobit": 0
+            },
+            {
+                "question": "Infobit://I2//",
+                "answer": "",
+                "infobit": 1
+            },
+            {
+                "question": "A2",
+                "answer": "B2",
+                "infobit": 0
+            }
+        ]
     }
 ]
