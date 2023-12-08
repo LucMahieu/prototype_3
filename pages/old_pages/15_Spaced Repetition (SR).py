@@ -307,7 +307,7 @@ def space_repetition_page(title, questions, answers):
 
 # Function to load content from JSON file
 def load_content():
-    with open("./pages/spaced_repetition_questions.json", "r") as f:
+    with open("./pages/spaced_repetition_questions_old.json", "r") as f:
         content = json.load(f)['content']
     return content
 
