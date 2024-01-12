@@ -12,7 +12,12 @@ db = client.LearnLoop
 from openai import OpenAI
 client = OpenAI()
 
-def get_progress(name, module, questions):
+# st.title("Spaced Repetition Versions")
+# st.write("The pages below this page contain the same flashcards per week, but the quizzes use a spaced repetition algorithm that makes studying more effective. This way you can choose to use the learning style you prefer.")
+# st.markdown("Here's how it works: You rate the difficulty of a flashcard, and the algorithm organizes the deck so that **harder flashcards appear more frequently**. If you find a flashcard **easy two times in a row**, it's removed from the list and you will progress.")
+# st.markdown("IMPORTANT: Your **progress is not saved** and is therefore lost when you refresh the page or switch pages. It is the current limitation of the prototype and will be fixed in later versions.")
+
+def get_progress(name, module, segments):
     # Get progress object from database
     user_doc = db.users.find_one({"username": name})
 
@@ -27,8 +32,7 @@ def get_progress(name, module, questions):
         return progress
     else:
         # User not found or does not have a progress field -> Initialize
-        print("User not found or does not have a progress field")
-        return {'indices': list(range(len(questions))), 'easy_count': {}}
+        return {'indices': list(range(len(segments))), 'easy_count': {}}
 
 def upload_progress(name, indices, easy_count, module):
     # Update global progress state, check if it exists
@@ -54,7 +58,7 @@ def upload_progress(name, indices, easy_count, module):
         print("User does not exist, not updating progress")
 
 
-def space_repetition_page(title, questions, answers):
+def space_repetition_page(title, segments):
     def change_card_index(index):
         card_idx = st.session_state.indices.pop(0)
 
@@ -79,8 +83,7 @@ def space_repetition_page(title, questions, answers):
         st.session_state.easy_count[current_card] = 0
 
     def initialise_new_page():
-        st.session_state.questions = questions.copy()
-        st.session_state.answers = answers.copy()
+        st.session_state.segments = segments.copy()
 
     ## Answer input field
     def process_answer(student_answer):
@@ -152,6 +155,9 @@ def space_repetition_page(title, questions, answers):
             if total == '0':
                 score_percentage = 0
             else:
+                # If there is a comma, change it to a dot
+                if ',' in part:
+                    part = part.replace(',', '.')
                 score_percentage = float(part) / float(total)
         except Exception as e:
             st.error(f"Error calculating score: {e}")
@@ -199,19 +205,19 @@ def space_repetition_page(title, questions, answers):
         st.markdown(progress_bar_style, unsafe_allow_html=True)
 
         # Initialise progress bar
-        if len(questions) > 0:
+        if len(segments) > 0:
             # progress = int(sum(st.session_state.easy_count.values()) / (2 * len(questions)) * 100) # Does not work anymore due to infobits
-            progress = 100 - int((len(st.session_state.indices) / len(questions)) * 100)
+            progress = 100 - int((len(st.session_state.indices) / len(segments)) * 100)
         else:
             progress = 0
         st.progress(progress)
         st.session_state.progress = progress
 
     def render_question():
-        current_question = st.session_state.questions[st.session_state.indices[0]]
+        current_question = st.session_state.segments[st.session_state.indices[0]]['question']
 
         # Condition used to indicate if current question is infobit
-        infobit = current_question[0:8] == "Infobit:"
+        infobit = bool(st.session_state.segments[st.session_state.indices[0]]['infobit'])
 
         # Text input field and submit button
         if not st.session_state.submitted and infobit is not True:
@@ -250,18 +256,16 @@ def space_repetition_page(title, questions, answers):
         st.button('Explanation', use_container_width=True, on_click=toggle_answer)
 
         if st.session_state.show_answer:
-            st.markdown(st.session_state.answers[st.session_state.indices[0]])
-
+            st.markdown(st.session_state.segments[st.session_state.indices[0]]['answer'])
 
     # -- Construct page
 
     # Check if title is the same, else reset
     if 'title' not in st.session_state or st.session_state.title != title:
         st.session_state.title = title
-        st.session_state.questions = questions
-        st.session_state.answers = answers
+        st.session_state.segments = segments
 
-        progress = get_progress(st.session_state.name, st.session_state.selected_module, questions)
+        progress = get_progress(st.session_state.name, st.session_state.selected_module, segments)
         st.session_state.indices = progress['indices']
         st.session_state.easy_count = progress['easy_count']
 
@@ -291,10 +295,9 @@ def space_repetition_page(title, questions, answers):
         st.write("Please provide some feedback on your experience via the sidebar.")
         # Restart button
         if st.button('Reset deck'):
-            st.session_state.questions = questions.copy()
-            st.session_state.answers = answers.copy()
+            st.session_state.segments = segments.copy()
             st.session_state.easy_count = {}
-            st.session_state.indices = list(range(len(questions)))
+            st.session_state.indices = list(range(len(segments)))
             # Trigger full rerender
             st.rerun()
 
@@ -316,7 +319,7 @@ def space_repetition_page(title, questions, answers):
 # Function to load content from JSON file
 def load_content():
     with open("./pages/spaced_repetition_questions.json", "r") as f:
-        content = json.load(f)['content']
+        content = json.load(f)
     return content
 
 # Create a list of possible pages based on the titles in the json file
@@ -341,7 +344,7 @@ def display_page(page_title, content):
     page_idx = next((index for (index, d) in enumerate(content) if d["title"] == page_title), None)
     if page_idx is not None:
         page_content = content[page_idx]
-        space_repetition_page(page_content['title'], page_content['questions'], page_content['answers'])
+        space_repetition_page(page_content['title'], page_content['segments'])
 
 
 ## RENDERING
@@ -361,14 +364,11 @@ if 'selected_module' not in st.session_state:
 if 'pages' not in st.session_state:
     st.session_state.pages = []
 
-if 'questions' not in st.session_state:
-    st.session_state.questions = None
+if 'segments' not in st.session_state:
+    st.session_state.segments = None
 
 if 'current_question' not in st.session_state:
     st.session_state.current_question = ''
-
-if 'answers' not in st.session_state:
-    st.session_state.answers = None
 
 if 'current_answer' not in st.session_state:
     st.session_state.current_answer = ''
