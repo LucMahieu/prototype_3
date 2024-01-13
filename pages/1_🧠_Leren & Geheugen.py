@@ -99,30 +99,37 @@ def space_repetition_page(title, segments):
         st.session_state.answer = input_text
 
     def evaluate_answer(answer, question, gold_answer):
-        prompt = f"Input:\nVraag: {question}\nAntwoord student: {answer}\nBeoordelingsrubriek: {gold_answer}\nOutput:\n"
+        # Toggle to turn openai request on/off for testing
+        testing = True
 
-        # Read the role prompt from a file
-        with open("./pages/system_role_prompt.txt", "r") as f:
-            role_prompt = f.read()
+        if testing != True:
+            prompt = f"Input:\nVraag: {question}\nAntwoord student: {answer}\nBeoordelingsrubriek: {gold_answer}\nOutput:\n"
 
-        response = client.chat.completions.create(
-            model="gpt-4-1106-preview",
-            messages=[
-                {"role": "system", "content": role_prompt},
-                {"role": "user", "content": prompt}
-            ],
-            max_tokens=300
-        )
+            # Read the role prompt from a file
+            with open("./pages/system_role_prompt.txt", "r") as f:
+                role_prompt = f.read()
 
-        split_response = response.choices[0].message.content.split(";;")
+            response = client.chat.completions.create(
+                model="gpt-4-1106-preview",
+                messages=[
+                    {"role": "system", "content": role_prompt},
+                    {"role": "user", "content": prompt}
+                ],
+                max_tokens=300
+            )
 
-        if len(split_response) != 2:
-            raise ValueError("Server response is not in the correct format. Please retry.")
+            split_response = response.choices[0].message.content.split(";;")
 
-        feedback = split_response[0].split(">>")
-        score = split_response[1]
+            if len(split_response) != 2:
+                raise ValueError("Server response is not in the correct format. Please retry.")
 
-        return score, feedback
+            feedback = split_response[0].split(">>")
+            score = split_response[1]
+
+            return score, feedback
+        
+        else:
+            return "2/2", "F"
 
     def next_question(difficulty):
         st.session_state.submitted = False
@@ -205,7 +212,6 @@ def space_repetition_page(title, segments):
 
         # Initialise progress bar
         if len(segments) > 0:
-            # progress = int(sum(st.session_state.easy_count.values()) / (2 * len(questions)) * 100) # Does not work anymore due to infobits
             progress = 100 - int((len(st.session_state.indices) / len(segments)) * 100)
         else:
             progress = 0
@@ -237,25 +243,22 @@ def space_repetition_page(title, segments):
             # Display the submitted text as solid text
             with question_cont:
                 st.subheader(current_question)
-            st.write("Your answer:")
-            st.write(st.session_state.answer)
+                st.write("Your answer:")
+                st.write(st.session_state.answer)
 
     def render_next_buttons():
         col1, col2, col3 = st.columns(3)
         with col1:
             st.button('Got it', use_container_width=True, on_click=lambda: next_question('easy'))
         with col2:
-            st.button('Getting closer', use_container_width=True, on_click=lambda: next_question('medium'))
+            st.button('Repeat early', use_container_width=True, on_click=lambda: next_question('medium'))
         with col3:
-            st.button('Some extra practice', use_container_width=True, on_click=lambda: next_question('hard'))
+            st.button('Repeat later', use_container_width=True, on_click=lambda: next_question('hard'))
 
     def render_explanation():
-        def toggle_answer():
-            st.session_state.show_answer = not st.session_state.show_answer
-        st.button('Explanation', use_container_width=True, on_click=toggle_answer)
-
-        if st.session_state.show_answer:
+        with st.expander("Explanation"):
             st.markdown(st.session_state.segments[st.session_state.indices[0]]['answer'])
+
 
     # -- Construct page
 
@@ -279,8 +282,6 @@ def space_repetition_page(title, segments):
             st.session_state.feedback = ""
         if 'difficulty' not in st.session_state:
             st.session_state.difficulty = ""
-
-    # print("Rendering with session state: ", st.session_state.indices, st.session_state.easy_count)
 
     # Read and store current file name
     st.session_state.current_page_name = __file__
@@ -327,11 +328,6 @@ def load_content():
 def get_pages(content):
     titles = [page['title'] for page in content]
 
-    # # Add scores to titles
-    # for i, title in enumerate(titles):
-    #     if title in st.session_state.progress:
-    #         titles[i] += " (" + str(st.session_state.progress[title]) + "%)"
-
     return titles
 
 
@@ -351,9 +347,6 @@ def display_page(page_title, content):
 ## RENDERING
 
 utils.init_session_state()
-
-# if 'progress' not in st.session_state:
-#     st.session_state.progress = 0
 
 if 'answer' not in st.session_state:
     st.session_state.answer = ""
