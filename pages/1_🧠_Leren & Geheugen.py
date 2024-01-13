@@ -86,12 +86,15 @@ def space_repetition_page(title, segments):
         st.session_state.segments = segments.copy()
 
     ## Answer input field
-    def process_answer(input_text):
-        print("Evaluating answer...")
+    def process_answer():
+        # Input in the text area is saved in session state with key "student_answer"
+        input_text = st.session_state.student_answer
+
         with st.spinner('Evaluating your answer...'):
             current_question = st.session_state.segments[st.session_state.indices[0]]['question']
             current_answer = st.session_state.segments[st.session_state.indices[0]]['answer']
             score, feedback = evaluate_answer(input_text, current_question, current_answer)
+        
         # Store the score and feedback in the session state to access them after the input disappears
         st.session_state.submitted = True
         st.session_state.score = score
@@ -99,10 +102,10 @@ def space_repetition_page(title, segments):
         st.session_state.answer = input_text
 
     def evaluate_answer(answer, question, gold_answer):
-        # Toggle to turn openai request on/off for testing
-        testing = True
+        # Toggle to turn openai request on/off for easier and cheaper testing
+        currently_testing = False
 
-        if testing != True:
+        if currently_testing != True:
             prompt = f"Input:\nVraag: {question}\nAntwoord student: {answer}\nBeoordelingsrubriek: {gold_answer}\nOutput:\n"
 
             # Read the role prompt from a file
@@ -226,9 +229,11 @@ def space_repetition_page(title, segments):
 
         # Text input field and submit button
         if not st.session_state.submitted and infobit is not True:
-            answer = st.text_area(label='Your answer', label_visibility='hidden', placeholder="Type your answer",
-                                  key='answer')
-            st.button('Submit', on_click=process_answer, use_container_width=True, args=(answer,))
+            st.text_area(label='Your answer', label_visibility='hidden', 
+                              placeholder="Type your answer",
+                              key='student_answer')
+            
+            st.button('Submit', on_click=process_answer, use_container_width=True)
             with question_cont:
                 st.subheader(current_question)
 
@@ -243,7 +248,7 @@ def space_repetition_page(title, segments):
             # Display the submitted text as solid text
             with question_cont:
                 st.subheader(current_question)
-                st.write("Your answer:")
+                st.markdown("<span style='color: lightgrey;'>Your answer:</span>", unsafe_allow_html=True)
                 st.write(st.session_state.answer)
 
     def render_next_buttons():
