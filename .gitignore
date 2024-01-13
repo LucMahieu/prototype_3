@@ -2,3 +2,4 @@
 .idea
 data
 #.streamlit/secrets.toml
+**.pyc
