@@ -2,5 +2,5 @@
 .idea
 data
 #.streamlit/secrets.toml
-**.pyc
-__pycache__
+**.py[cod]
+__pycache__/
