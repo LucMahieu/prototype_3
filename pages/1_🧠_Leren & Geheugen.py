@@ -86,20 +86,19 @@ def space_repetition_page(title, segments):
         st.session_state.segments = segments.copy()
 
     ## Answer input field
-    def process_answer(student_answer):
+    def process_answer(input_text):
+        print("Evaluating answer...")
         with st.spinner('Evaluating your answer...'):
-            current_question = st.session_state.questions[st.session_state.indices[0]]
-            current_answer = st.session_state.answers[st.session_state.indices[0]]
-            score, feedback = evaluate_answer(student_answer, current_question, current_answer)
+            current_question = st.session_state.segments[st.session_state.indices[0]]['question']
+            current_answer = st.session_state.segments[st.session_state.indices[0]]['answer']
+            score, feedback = evaluate_answer(input_text, current_question, current_answer)
         # Store the score and feedback in the session state to access them after the input disappears
         st.session_state.submitted = True
         st.session_state.score = score
         st.session_state.feedback = feedback
-        st.session_state.answer = student_answer
+        st.session_state.answer = input_text
 
     def evaluate_answer(answer, question, gold_answer):
-        if answer is None:
-            st.write("No answer passed through call.")
         prompt = f"Input:\nVraag: {question}\nAntwoord student: {answer}\nBeoordelingsrubriek: {gold_answer}\nOutput:\n"
 
         # Read the role prompt from a file
@@ -280,6 +279,8 @@ def space_repetition_page(title, segments):
             st.session_state.feedback = ""
         if 'difficulty' not in st.session_state:
             st.session_state.difficulty = ""
+
+    # print("Rendering with session state: ", st.session_state.indices, st.session_state.easy_count)
 
     # Read and store current file name
     st.session_state.current_page_name = __file__
