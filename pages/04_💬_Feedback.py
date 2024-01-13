@@ -17,7 +17,7 @@ def main():
     # Submit button
     if st.session_state['submitted']:
         st.success("Bedankt voor je feedback!")
-        time.sleep(3)
+        time.sleep(5)
         st.session_state['submitted'] = False
         st.experimental_rerun()
     if not st.session_state['submitted']:
