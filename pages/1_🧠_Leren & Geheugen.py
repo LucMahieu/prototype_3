@@ -103,7 +103,7 @@ def space_repetition_page(title, segments):
 
     def evaluate_answer(answer, question, gold_answer):
         # Toggle to turn openai request on/off for easier and cheaper testing
-        currently_testing = False
+        currently_testing = True
 
         if currently_testing != True:
             prompt = f"Input:\nVraag: {question}\nAntwoord student: {answer}\nBeoordelingsrubriek: {gold_answer}\nOutput:\n"
@@ -144,7 +144,10 @@ def space_repetition_page(title, segments):
         # Check which difficulty level was pressed and sort card deck accordingly
         if difficulty == 'easy':
             # Count executive times the user found current card easy
-            evaluate_graduation(st.session_state.indices[0])
+            # evaluate_graduation(st.session_state.indices[0])
+
+            # Remove card from deck so it won't repeat
+            st.session_state.indices.pop(0)
         else:
             reset_easy_count(st.session_state.indices[0])
             if difficulty == 'medium':
@@ -248,18 +251,18 @@ def space_repetition_page(title, segments):
             # Display the submitted text as solid text
             with question_cont:
                 st.subheader(current_question)
-                st.markdown("<span style='color: lightgrey;'>Your answer:</span>", unsafe_allow_html=True)
+                st.markdown("<span style='color: grey;'>Your answer:</span>", unsafe_allow_html=True)
                 st.write(st.session_state.answer)
 
     def render_next_buttons():
         col1, col2, col3 = st.columns(3)
         with col1:
-            st.button('Got it', use_container_width=True, on_click=lambda: next_question('easy'))
+            st.button('Ask again 🔴', use_container_width=True, on_click=lambda: next_question('hard'))
         with col2:
-            st.button('Repeat early', use_container_width=True, on_click=lambda: next_question('medium'))
+            st.button('Repeat later 🟡', use_container_width=True, on_click=lambda: next_question('medium'))
         with col3:
-            st.button('Repeat later', use_container_width=True, on_click=lambda: next_question('hard'))
-
+            st.button('Got it 🟢', use_container_width=True, on_click=lambda: next_question('easy'))
+        
     def render_explanation():
         with st.expander("Explanation"):
             st.markdown(st.session_state.segments[st.session_state.indices[0]]['answer'])
