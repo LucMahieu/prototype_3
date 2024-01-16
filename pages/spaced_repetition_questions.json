@@ -50,26 +50,31 @@
         ]
     },
     {
-        "title": "Test",
+        "title": "Introductie Ontwikkeling",
         "segments": [
             {
-                "question": "Infobit://I1//",
+                "question": "//Waarom zou je de ontwikkeling bestuderen?// Het bestuderen van de menselijke ontwikkeling is essentieel om te begrijpen hoe genetische en omgevingsfactoren ons functioneren, gedrag en de ontwikkeling van ziekten beïnvloeden.",
                 "answer": "",
                 "infobit": 1
             },
             {
-                "question": "A1",
-                "answer": "B1",
-                "infobit": 0
-            },
-            {
-                "question": "Infobit://I2//",
+                "question": "//Genetische factoren// De ontwikkeling van een klompje cellen tot een volledig functionerend mens wordt grotendeels gereguleerd door onze genen. Zo wordt bijvoorbeeld je haarkleur, lichaamslengte en bloedgroep grotendeels genetisch bepaald.",
                 "answer": "",
                 "infobit": 1
             },
             {
-                "question": "A2",
-                "answer": "B2",
+                "question": "//Omgevingsfactoren// Omgevingsfactoren zoals stress, opvoeding en sociale interacties hebben een aanzienlijke invloed op de fysieke en mentale ontwikkeling van een individu. Zo beïnvloedt stress in de kindertijd het volwassen functioneren, verhogen bepaalde factoren tijdens de basisschoolperiode het risico op ziekten zoals Alzheimer, en heeft stress tijdens de zwangerschap een negatieve invloed op de ontwikkeling van het kind.",
+                "answer": "",
+                "infobit": 1
+            },
+            {
+                "question": "//Inzicht in het functioneren van de mens// De interactie tussen genetische en omgevingsfactoren leidt tot unieke individuele verschillen. Het bestuderen van deze interacties helpt ons inzicht te krijgen in menselijk gedrag, de variatie tussen personen, en de ontwikkeling van ziektebeelden gedurende het leven.",
+                "answer": "",
+                "infobit": 1
+            },
+            {
+                "question": "Kun je een voorbeeld geven van een genetische factor en een omgevingsfactor die de ontwikkeling en het functioneren van een individu kunnen beïnvloeden?",
+                "answer": "Een voorbeeld van een genetische factor is de bloedgroep, haarkleur of lichaamslengte van een individu (1 punt). Een voorbeeld van een omgevingsfactor is stress tijdens de zwangerschap of vroege levenstress (1 punt).",
                 "infobit": 0
             }
         ]
