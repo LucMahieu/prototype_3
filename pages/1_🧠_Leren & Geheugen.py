@@ -1,7 +1,7 @@
 import json
 
 import streamlit as st
-from PIL import Image
+from login import login_module
 
 import utils
 import database
@@ -264,7 +264,29 @@ def space_repetition_page(title, segments):
             st.button('Got it 🟢', use_container_width=True, on_click=lambda: next_question('easy'))
         
     def render_explanation():
+        st.markdown("""
+            <style>
+            .stButton>button {
+                color: black;
+                background-color: white;  # Change to your desired color
+                border: 1px red;
+                padding: 10px 20px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 16px;
+                margin: 4px 2px;
+                transition-duration: 0.4s;
+                cursor: pointer;
+            }
+            </style>
+            """, unsafe_allow_html=True)
+        
+        
         with st.expander("Explanation"):
+            st.button('Introductie')
+            st.button('Genetische factoren')
+            st.button('Omgevingsfactoren')
             st.markdown(st.session_state.segments[st.session_state.indices[0]]['answer'])
 
 
@@ -389,7 +411,7 @@ if 'current_page_name' not in st.session_state:
 # Function to handle authentication check
 def check_authentication():
     if st.session_state["authentication_status"] is False or st.session_state["authentication_status"] is None:
-        st.warning('Please enter your credentials on the homepage')
+        st.warning('Please log in on the homepage')
         return False
     return True
 
@@ -397,14 +419,20 @@ def check_authentication():
 if check_authentication():
     content = load_content()
     st.session_state.pages = get_pages(content)
+    
+    with st.sidebar:
+        st.sidebar.title("Ontwikkeling")
+        for option in st.session_state.pages:
+            with st.expander(option):
+                # Display buttons for the two fases in learning with LearnLoop
+                if st.button('Learning Phase 📖', key=option):
+                    st.session_state.selected_module = option
+                if st.button('Practice Phase 📝', key=option + ' practice'):
+                    st.session_state.selected_module = option
 
-    # Module options
-    st.sidebar.header("Modules")
-    for option in st.session_state.pages:
-        if st.sidebar.button(option):
-            st.session_state.selected_module = option
-
-            # display_page(option, content)
+        # for option in st.session_state.pages:
+        #     if st.sidebar.button(option):
+        #         st.session_state.selected_module = option
 
     # Display correct module
     if st.session_state.selected_module is None:
