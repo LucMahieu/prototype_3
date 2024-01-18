@@ -16,12 +16,12 @@ def merge_content_with_titles(data):
     return merged_modules
 
 # Assuming the JSON data is read from a file named 'data.json'
-with open('pages/spaced_repetition_questions.json', 'r', encoding='utf-8') as file:
+with open('spaced_repetition_questions.json', 'r', encoding='utf-8') as file:
     data = json.load(file)
 
 # Merging the content
 merged_content = merge_content_with_titles(data)
 
 # Write
-with open('pages/spaced_repetition_questions.json', 'w', encoding='utf-8') as file:
+with open('spaced_repetition_questions.json', 'w', encoding='utf-8') as file:
     json.dump(merged_content, file, ensure_ascii=False, indent=4)

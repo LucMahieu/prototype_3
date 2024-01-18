@@ -1,3 +1,19 @@
+import openai
+import streamlit as st
+from dotenv import load_dotenv
+import os
+import database
+import utils
+
+load_dotenv()
+utils.init_session_state()
+openai.api_key = st.secrets["OPENAI_API_KEY"]
+
+st.set_page_config(page_title="LearnLoop", layout="centered")
+
+## Load login page
+from login import login_module
+
 import json
 
 import streamlit as st
@@ -11,11 +27,6 @@ db = client.LearnLoop
 # Send to openai for validation
 from openai import OpenAI
 client = OpenAI()
-
-# st.title("Spaced Repetition Versions")
-# st.write("The pages below this page contain the same flashcards per week, but the quizzes use a spaced repetition algorithm that makes studying more effective. This way you can choose to use the learning style you prefer.")
-# st.markdown("Here's how it works: You rate the difficulty of a flashcard, and the algorithm organizes the deck so that **harder flashcards appear more frequently**. If you find a flashcard **easy two times in a row**, it's removed from the list and you will progress.")
-# st.markdown("IMPORTANT: Your **progress is not saved** and is therefore lost when you refresh the page or switch pages. It is the current limitation of the prototype and will be fixed in later versions.")
 
 def get_progress(name, module, segments):
     # Get progress object from database
@@ -35,10 +46,6 @@ def get_progress(name, module, segments):
         return {'indices': list(range(len(segments))), 'easy_count': {}}
 
 def upload_progress(name, indices, easy_count, module):
-    # Update global progress state, check if it exists
-    # st.session_state.indices = indices
-    # st.session_state.easy_count = easy_count
-
     # Check if user exists and update
     if db.users.find_one({"username": name}):
         # Easy count dict to string keys only
@@ -109,7 +116,7 @@ def space_repetition_page(title, segments):
             prompt = f"Input:\nVraag: {question}\nAntwoord student: {answer}\nBeoordelingsrubriek: {gold_answer}\nOutput:\n"
 
             # Read the role prompt from a file
-            with open("./pages/system_role_prompt.txt", "r") as f:
+            with open("./system_role_prompt.txt", "r") as f:
                 role_prompt = f.read()
 
             response = client.chat.completions.create(
@@ -264,25 +271,6 @@ def space_repetition_page(title, segments):
             st.button('Got it 🟢', use_container_width=True, on_click=lambda: next_question('easy'))
         
     def render_explanation():
-        st.markdown("""
-            <style>
-            .stButton>button {
-                color: black;
-                background-color: white;  # Change to your desired color
-                border: 1px red;
-                padding: 10px 20px;
-                text-align: center;
-                text-decoration: none;
-                display: inline-block;
-                font-size: 16px;
-                margin: 4px 2px;
-                transition-duration: 0.4s;
-                cursor: pointer;
-            }
-            </style>
-            """, unsafe_allow_html=True)
-        
-        
         with st.expander("Explanation"):
             st.button('Introductie')
             st.button('Genetische factoren')
@@ -350,7 +338,7 @@ def space_repetition_page(title, segments):
 
 # Function to load content from JSON file
 def load_content():
-    with open("./pages/spaced_repetition_questions.json", "r") as f:
+    with open("./spaced_repetition_questions.json", "r") as f:
         content = json.load(f)
     return content
 
@@ -414,6 +402,10 @@ def check_authentication():
         st.warning('Please log in on the homepage')
         return False
     return True
+
+with st.sidebar:
+    login_module()
+
 
 # Main logic
 if check_authentication():

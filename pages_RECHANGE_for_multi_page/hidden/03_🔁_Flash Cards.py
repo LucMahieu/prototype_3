@@ -1,14 +1,14 @@
 import json
-import random
 
 import streamlit as st
+
 import utils
+
 
 # st.title("Spaced Repetition Versions")
 # st.write("The pages below this page contain the same flashcards per week, but the quizzes use a spaced repetition algorithm that makes studying more effective. This way you can choose to use the learning style you prefer.")
 # st.markdown("Here's how it works: You rate the difficulty of a flashcard, and the algorithm organizes the deck so that **harder flashcards appear more frequently**. If you find a flashcard **easy two times in a row**, it's removed from the list and you will progress.")
 # st.markdown("IMPORTANT: Your **progress is not saved** and is therefore lost when you refresh the page or switch pages. It is the current limitation of the prototype and will be fixed in later versions.")
-
 
 def space_repetition_page(title, questions, answers):
     # Check if title is the same, else reset
@@ -142,7 +142,7 @@ def space_repetition_page(title, questions, answers):
         prompt = f"Question: {question}\nCorrect Answer: {gold_answer}\nUser Answer: {answer}\nIs the user's answer correct?"
 
         # Read the role prompt from a file
-        with open("./pages/system_role_prompt.txt", "r") as f:
+        with open("./system_role_prompt.txt", "r") as f:
             role_prompt = f.read()
 
         print({"role": "system", "content": role_prompt},
@@ -282,5 +282,4 @@ else:
         if st.sidebar.button(option):
             # Display the selected page and reset the state if needed
             display_page(option, content)
-
 
