@@ -1,6 +1,6 @@
 [
     {
-        "title": "Hoorcollege 1: Episodisch en Semantisch Geheugen - Deel 1",
+        "title": "Introductie Ontwikkeling",
         "segments": [
             {
                 "question": "//Amnesie en Episodisch en Semantisch Geheugen// In deze module duiken we in het geheugen, waarbij we beginnen met uitleg over geheugenverlies, inclusief de verhalen over mensen die moeite hebben met het onthouden van nieuwe dingen of het herinneren van het verleden. We bekijken hoe delen van de hersenen zoals de hippocampus en neocortex helpen bij het opslaan van herinneringen en hoe verschillende soorten geheugen, zoals persoonlijke ervaringen en feitenkennis, ons maken tot wie we zijn. Ook bespreken we hoe we informatie verwerken en onthouden, en wat de beste manieren zijn om te leren en te studeren.",
@@ -50,7 +50,7 @@
         ]
     },
     {
-        "title": "Introductie Ontwikkeling",
+        "title": "Embryologie",
         "segments": [
             {
                 "question": "//Waarom zou je de ontwikkeling bestuderen?// Het bestuderen van de menselijke ontwikkeling is essentieel om te begrijpen hoe genetische en omgevingsfactoren ons functioneren, gedrag en de ontwikkeling van ziekten beïnvloeden.",
@@ -76,6 +76,36 @@
                 "question": "Kun je een voorbeeld geven van een genetische factor en een omgevingsfactor die de ontwikkeling en het functioneren van een individu kunnen beïnvloeden?",
                 "answer": "Een voorbeeld van een genetische factor is de bloedgroep, haarkleur of lichaamslengte van een individu (1 punt). Een voorbeeld van een omgevingsfactor is stress tijdens de zwangerschap of vroege levenstress (1 punt).",
                 "infobit": 0
+            }
+        ]
+    },
+    {
+        "title": "Bevruchting",
+        "segments": [
+            {
+                "question": "//Waarom zou je de ontwikkeling bestuderen?// Het bestuderen van de menselijke ontwikkeling is essentieel om te begrijpen hoe genetische en omgevingsfactoren ons functioneren, gedrag en de ontwikkeling van ziekten beïnvloeden.",
+                "answer": "",
+                "infobit": 1
+            },
+            {
+                "question": "//Genetische factoren// De ontwikkeling van een klompje cellen tot een volledig functionerend mens wordt grotendeels gereguleerd door onze genen. Zo wordt bijvoorbeeld je haarkleur, lichaamslengte en bloedgroep grotendeels genetisch bepaald.",
+                "answer": "",
+                "infobit": 1
+            }
+        ]
+    },
+    {
+        "title": "Gastrulatie",
+        "segments": [
+            {
+                "question": "//Waarom zou je de ontwikkeling bestuderen?// Het bestuderen van de menselijke ontwikkeling is essentieel om te begrijpen hoe genetische en omgevingsfactoren ons functioneren, gedrag en de ontwikkeling van ziekten beïnvloeden.",
+                "answer": "",
+                "infobit": 1
+            },
+            {
+                "question": "//Genetische factoren// De ontwikkeling van een klompje cellen tot een volledig functionerend mens wordt grotendeels gereguleerd door onze genen. Zo wordt bijvoorbeeld je haarkleur, lichaamslengte en bloedgroep grotendeels genetisch bepaald.",
+                "answer": "",
+                "infobit": 1
             }
         ]
     }
