@@ -4,29 +4,19 @@ from dotenv import load_dotenv
 import os
 import database
 import utils
+import json
+from login import login_module
+from openai import OpenAI
+client = OpenAI()
 
 load_dotenv()
 utils.init_session_state()
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 
-st.set_page_config(page_title="LearnLoop", layout="centered")
+st.set_page_config(page_title="LearnLoop", layout="wide")
 
-## Load login page
-from login import login_module
-
-import json
-
-import streamlit as st
-from login import login_module
-
-import utils
-import database
 client = database.init_connection(**st.secrets["mongo"])
 db = client.LearnLoop
-
-# Send to openai for validation
-from openai import OpenAI
-client = OpenAI()
 
 def get_progress(name, module, segments):
     # Get progress object from database
@@ -73,18 +63,18 @@ def space_repetition_page(title, segments):
             # Insert at given index
             st.session_state.indices.insert(index, card_idx)
 
-    def evaluate_graduation(current_card):
-        if current_card in st.session_state.easy_count:
-            st.session_state.easy_count[current_card] += 1
-        else:
-            st.session_state.easy_count[current_card] = 1
+    # def evaluate_graduation(current_card):
+    #     if current_card in st.session_state.easy_count:
+    #         st.session_state.easy_count[current_card] += 1
+    #     else:
+    #         st.session_state.easy_count[current_card] = 1
 
-        # Delete card if graduated
-        if st.session_state.easy_count[current_card] >= 2:
-            st.session_state.indices.pop(0) # Remove the index of the graduated card
-        else:
-            # Move card to back of deck
-            change_card_index(20)  # Adjust this value as needed
+    #     # Delete card if graduated
+    #     if st.session_state.easy_count[current_card] >= 2:
+    #         st.session_state.indices.pop(0) # Remove the index of the graduated card
+    #     else:
+    #         # Move card to back of deck
+    #         change_card_index(20)  # Adjust this value as needed
 
     def reset_easy_count(current_card):
         st.session_state.easy_count[current_card] = 0
@@ -97,10 +87,11 @@ def space_repetition_page(title, segments):
         # Input in the text area is saved in session state with key "student_answer"
         input_text = st.session_state.student_answer
 
-        with st.spinner('Evaluating your answer...'):
-            current_question = st.session_state.segments[st.session_state.indices[0]]['question']
-            current_answer = st.session_state.segments[st.session_state.indices[0]]['answer']
-            score, feedback = evaluate_answer(input_text, current_question, current_answer)
+        with eval_spinner_cont:
+            with st.spinner('Evaluating your answer...'):
+                current_question = st.session_state.segments[st.session_state.indices[0]]['question']
+                current_answer = st.session_state.segments[st.session_state.indices[0]]['answer']
+                score, feedback = evaluate_answer(input_text, current_question, current_answer)
         
         # Store the score and feedback in the session state to access them after the input disappears
         st.session_state.submitted = True
@@ -242,8 +233,13 @@ def space_repetition_page(title, segments):
             st.text_area(label='Your answer', label_visibility='hidden', 
                               placeholder="Type your answer",
                               key='student_answer')
-            
-            st.button('Submit', on_click=process_answer, use_container_width=True)
+            col_prev_question, col_check, col_next_question = st.columns([1, 5, 1])
+            with col_prev_question:
+                st.button('Previous', use_container_width=True, on_click=change_card_index(1))
+            with col_check:
+                st.button('Check', on_click=process_answer, use_container_width=True, key='Submit')
+            with col_next_question:
+                st.button('Next', use_container_width=True, on_click=change_card_index(-1))
             with question_cont:
                 st.subheader(current_question)
 
@@ -253,7 +249,11 @@ def space_repetition_page(title, segments):
                 info, title, text = current_question.split("//")
                 st.subheader(title)
                 st.write(text)
-            st.button('Next', use_container_width=True, on_click=change_card_index(-1))
+            col_prev, col_next = st.columns(2)
+            with col_prev:
+                st.button('Previous', use_container_width=True, on_click=change_card_index(1))
+            with col_next:
+                st.button('Next', use_container_width=True, on_click=change_card_index(-1))
         else:
             # Display the submitted text as solid text
             with question_cont:
@@ -261,20 +261,42 @@ def space_repetition_page(title, segments):
                 st.markdown("<span style='color: grey;'>Your answer:</span>", unsafe_allow_html=True)
                 st.write(st.session_state.answer)
 
-    def render_next_buttons():
-        col1, col2, col3 = st.columns(3)
+    def render_SR_buttons():
+        col_prev, col1, col2, col3, col_next = st.columns([1.8, 3, 3, 3, 1.8])
+        with col_prev:
+            st.button('Previous', use_container_width=True)
         with col1:
-            st.button('Ask again 🔴', use_container_width=True, on_click=lambda: next_question('hard'))
+            st.button('Ask again ↩️', use_container_width=True, on_click=lambda: next_question('hard'))
         with col2:
-            st.button('Repeat later 🟡', use_container_width=True, on_click=lambda: next_question('medium'))
+            st.button('Repeat later 🕒', use_container_width=True, on_click=lambda: next_question('medium'))
         with col3:
-            st.button('Got it 🟢', use_container_width=True, on_click=lambda: next_question('easy'))
-        
+            st.button('Got it ✅', use_container_width=True, on_click=lambda: next_question('easy'))
+        with col_next:
+            st.button('Next', use_container_width=True)
+
+
+    def render_add_to_practice_buttons():
+        col_add, col_yes, col_no = st.columns(3)
+        with col_add:
+            # st.subheader('Add to **Practice Phase** 📝?')
+            st.markdown("""
+                <style>
+                .centered {
+                    text-align: center;
+                }
+                </style>
+                <div class="centered">
+                    <p style="font-size: 18px;">Add to <strong>Practice Phase</strong> 📝?</p>
+                </div>
+            """, unsafe_allow_html=True)
+        with col_yes:
+            st.button('Yes', use_container_width=True)
+        with col_no:
+            st.button('No', use_container_width=True)
+
+ 
     def render_explanation():
         with st.expander("Explanation"):
-            st.button('Introductie')
-            st.button('Genetische factoren')
-            st.button('Omgevingsfactoren')
             st.markdown(st.session_state.segments[st.session_state.indices[0]]['answer'])
 
 
@@ -311,8 +333,10 @@ def space_repetition_page(title, segments):
         st.session_state.previous_page_name = st.session_state.current_page_name
 
     if len(st.session_state.indices) == 0:
-        st.write("You completed this deck, well done! 🎉")
-        st.write("Please provide some feedback on your experience via the sidebar.")
+        st.title('Done')
+        st.write("You've completed the **learning phase** 📖, well done!")
+        st.write("To internalise the concepts, you can use the **practice phase** 📝.")
+        st.balloons()
         # Restart button
         if st.button('Reset deck'):
             st.session_state.segments = segments.copy()
@@ -322,17 +346,29 @@ def space_repetition_page(title, segments):
             st.rerun()
 
     if len(st.session_state.indices) > 0:
-        # RENDER COMPONENTS
-        render_progress_bar()
-        question_cont = st.container()
-        render_question()
+        # Renders components on page.
+        # Side columns function as margins for the middle column
+        side_col1, mid_col, side_col2 = st.columns([1, 6, 1])
+        with mid_col:
+            render_progress_bar()
 
-        # After submission, display the result
-        if st.session_state.submitted:
-            # Display the feedback
-            display_result()
-            render_next_buttons()
-            render_explanation()
+            # Container ensures right placement of question
+            question_cont = st.container()
+            render_question()
+
+            # Container for a spinner that displays during evaluating answer
+            eval_spinner_cont = st.container()
+
+            # After submission, display the result
+            if st.session_state.submitted:
+                # Display the feedback
+                display_result()
+                render_SR_buttons()
+                render_explanation()
+
+            # REMOVE WHEN CONFIGURING THE PAGES AND BUTTONS CORRECTLY
+            render_add_to_practice_buttons()
+
 
 # ====================
 
@@ -399,12 +435,40 @@ if 'current_page_name' not in st.session_state:
 # Function to handle authentication check
 def check_authentication():
     if st.session_state["authentication_status"] is False or st.session_state["authentication_status"] is None:
-        st.warning('Please log in on the homepage')
+
+        # courses_header, learnloop_logo = st.columns(2)
+        # with courses_header:
+        #     st.markdown('<p style="font-size: 60px;">Courses</p>', unsafe_allow_html=True)
+        # with learnloop_logo:
+        #     st.image('logo.png', width=100)
+
+        # Display 'Courses' header
+        st.markdown('<p style="font-size: 60px;"><strong>Courses</strong></p>', unsafe_allow_html=True)
+
+        # Display courses
+        course_1, course_2 = st.columns(2)
+        with course_1:
+            st.image('neuropsycho.png')
+        with course_2:
+            st.image('neuropsycho.png')
+
+        # Load login module at top of sidebar, but remove from top when logged in
+        with st.sidebar:
+
+            # Place logo in horizontal centre of sidebar
+            render_logo()
+
+            # Login in sidebar
+            login_module()
+
         return False
     return True
 
-with st.sidebar:
-    login_module()
+def render_logo():
+    # Place logo in horizontal centre of sidebar with spacer column
+    spacer, image_col = st.columns([0.4, 1])
+    with image_col:
+        st.image('logo.png', width=100)
 
 
 # Main logic
@@ -422,9 +486,8 @@ if check_authentication():
                 if st.button('Practice Phase 📝', key=option + ' practice'):
                     st.session_state.selected_module = option
 
-        # for option in st.session_state.pages:
-        #     if st.sidebar.button(option):
-        #         st.session_state.selected_module = option
+        # Display login module at bottom of sidebar after logged in
+        login_module()
 
     # Display correct module
     if st.session_state.selected_module is None:

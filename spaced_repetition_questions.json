@@ -3,6 +3,11 @@
         "title": "Introductie Ontwikkeling",
         "segments": [
             {
+                "question": "Question",
+                "answer": "lala",
+                "infobit": 0
+            },
+            {
                 "question": "//Amnesie en Episodisch en Semantisch Geheugen// In deze module duiken we in het geheugen, waarbij we beginnen met uitleg over geheugenverlies, inclusief de verhalen over mensen die moeite hebben met het onthouden van nieuwe dingen of het herinneren van het verleden. We bekijken hoe delen van de hersenen zoals de hippocampus en neocortex helpen bij het opslaan van herinneringen en hoe verschillende soorten geheugen, zoals persoonlijke ervaringen en feitenkennis, ons maken tot wie we zijn. Ook bespreken we hoe we informatie verwerken en onthouden, en wat de beste manieren zijn om te leren en te studeren.",
                 "answer": "",
                 "infobit": 1
