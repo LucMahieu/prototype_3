@@ -1,0 +1,15 @@
+{
+    "module_name": "Embryologie",
+    "segments": [
+        {
+            "question": "//Embryo// Een embryo is een organisme in een vroeg stadium van ontwikkeling. Bij mensen wordt de term embryo gebruikt om de periode vanaf de bevruchting tot de achtste week van de zwangerschap aan te duiden.",
+            "answer": "",
+            "infobit": 1
+        },
+        {
+            "question": "Kun je een voorbeeld geven van de embryonale ontwikkeling van een mens?",
+            "answer": "Een voorbeeld van een genetische factor is de bloedgroep, haarkleur of lichaamslengte van een individu (1 punt). Een voorbeeld van een omgevingsfactor is stress tijdens de zwangerschap of vroege levenstress (1 punt).",
+            "infobit": 0
+        }
+    ]
+}

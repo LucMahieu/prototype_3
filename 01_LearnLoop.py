@@ -3,14 +3,12 @@ import streamlit as st
 from dotenv import load_dotenv
 import os
 import database
-import utils
 import json
 from login import login_module
 from openai import OpenAI
 client = OpenAI()
 
 load_dotenv()
-utils.init_session_state()
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 st.set_page_config(page_title="LearnLoop", layout="wide")
@@ -18,22 +16,32 @@ st.set_page_config(page_title="LearnLoop", layout="wide")
 db_client = database.init_connection(**st.secrets["mongo"])
 db = db_client.LearnLoop
 
-def get_progress(name, module, segments):
-    # Get progress object from database
-    user_doc = db.users.find_one({"username": name})
 
+def get_progress():
+    """
+    Gets the progress of the user from the database in the form of a dictionary
+    that consists of an index and other info relevant to the progress.
+    """
+    # For convenience, store the selected module name in a variable
+    module = st.session_state.selected_module
+
+    # Get progress object from database
+    user_doc = db.users.find_one({"username": st.session_state.student_name})
 
     if user_doc is not None and "progress" in user_doc and module in user_doc["progress"]:
         # User found and has a progress field
         progress = user_doc["progress"][module]
 
-        # Parse int in keys of easy_count
-        progress["easy_count"] = {int(k): v for k, v in progress["easy_count"].items()}
+        # # Parse int in keys of easy_count
+        # progress["easy_count"] = {int(k): v for k, v in progress["easy_count"].items()}
+
+        st.write(progress)
 
         return progress
     else:
         # User not found or does not have a progress field -> Initialize
-        return {'indices': list(range(len(segments))), 'easy_count': {}}
+        return {'index': 0, 'easy_count': {}}
+
 
 def upload_progress(name, indices, easy_count, module):
     # Check if user exists and update
@@ -54,12 +62,9 @@ def upload_progress(name, indices, easy_count, module):
     else:
         print("User does not exist, not updating progress")
 
-def learning_phase_page(title, segments):
-    # Function to display the page that contains the practice questions and 
-    # answers without the infobits and with the spaced repetition buttons.
-    return
 
 def change_card_index(index):
+    """Function to change the index of the current card in the deck."""
     card_idx = st.session_state.indices.pop(0)
 
     if index > -1:
@@ -84,11 +89,8 @@ def change_card_index(index):
 def reset_easy_count(current_card):
     st.session_state.easy_count[current_card] = 0
 
-def initialise_new_page(segments):
-    st.session_state.segments = segments.copy()
-
 ## Answer input field
-def process_answer(eval_spinner_cont):
+def process_answer():
     # Input in the text area is saved in session state with key "student_answer"
     input_text = st.session_state.student_answer
 
@@ -159,10 +161,9 @@ def next_question(difficulty):
             change_card_index(2)
 
     # Save progress to db after next is pressed
-    upload_progress(st.session_state.name, st.session_state.indices, st.session_state.easy_count, st.session_state.selected_modul)
+    upload_progress(st.session_state.student_name, st.session_state.easy_count, st.session_state.selected_module)
 
 
-# Define a function to display the score and feedback with color coding
 def display_result():
     try:
         # Calculate the score percentage
@@ -200,6 +201,7 @@ def display_result():
 
     st.markdown(result_html, unsafe_allow_html=True)
 
+
 def render_progress_bar(segments):
     # Change style of progressbar
     progress_bar_style = """
@@ -211,7 +213,7 @@ def render_progress_bar(segments):
     }
     /* Change moving part of progress bar */
     .stProgress .st-bo {
-        background-color: #00A000;
+        background-color: green;
         height: 20px;
         border-radius: 30px;
     }
@@ -219,53 +221,16 @@ def render_progress_bar(segments):
     """
     st.markdown(progress_bar_style, unsafe_allow_html=True)
 
-    # Initialise progress bar
+    # Initialise progress bar or update progress that indicates the relative segment index
     if len(segments) > 0:
-        progress = 100 - int((len(st.session_state.indices) / len(segments)) * 100)
+        progress = int((st.session_state.segment_index + 1) / len(segments) * 100)
     else:
         progress = 0
+
+    # Update the progress bar
     st.progress(progress)
     st.session_state.progress = progress
 
-
-def render_question(question_cont):
-    current_question = st.session_state.segments[st.session_state.indices[0]]['question']
-
-    # Condition used to indicate if current question is infobit
-    infobit = bool(st.session_state.segments[st.session_state.indices[0]]['infobit'])
-
-    # Text input field and submit button
-    if not st.session_state.submitted and infobit is not True:
-        st.text_area(label='Your answer', label_visibility='hidden', 
-                            placeholder="Type your answer",
-                            key='student_answer')
-        col_prev_question, col_check, col_next_question = st.columns([1, 5, 1])
-        with col_prev_question:
-            st.button('Previous', use_container_width=True, on_click=change_card_index(1))
-        with col_check:
-            st.button('Check', on_click=process_answer, use_container_width=True, key='Submit')
-        with col_next_question:
-            st.button('Next', use_container_width=True, on_click=change_card_index(-1))
-        with question_cont:
-            st.subheader(current_question)
-
-    # Display infobit
-    elif not st.session_state.submitted and infobit:
-        with question_cont:
-            info, title, text = current_question.split("//")
-            st.subheader(title)
-            st.write(text)
-        col_prev, col_next = st.columns(2)
-        with col_prev:
-            st.button('Previous', use_container_width=True, on_click=change_card_index(1))
-        with col_next:
-            st.button('Next', use_container_width=True, on_click=change_card_index(-1))
-    else:
-        # Display the submitted text as solid text
-        with question_cont:
-            st.subheader(current_question)
-            st.markdown("<span style='color: grey;'>Your answer:</span>", unsafe_allow_html=True)
-            st.write(st.session_state.answer)
 
 def render_SR_buttons():
     col_prev, col1, col2, col3, col_next = st.columns([1.8, 3, 3, 3, 1.8])
@@ -306,43 +271,105 @@ def render_explanation():
         st.markdown(st.session_state.segments[st.session_state.indices[0]]['answer'])
 
 
+def change_segment_index(step):
+    """Change the segment index based on the direction of navigation."""
+    # Store segments in variable for convenience        
+    segments = st.session_state.page_content['segments']
 
-def practice_phase_page(title, segments):
-    # Function to 
+    if st.session_state.segment_index + step in range(len(segments)):
+        st.session_state.segment_index += step
+    elif st.session_state.segment_index == len(segments) - 1:
+        st.session_state.segment_index = 0
+    else:
+        st.session_state.segment_index = len(segments) - 1
+
+
+def render_navigation_buttons():
+    """Render the navigation buttons that allows users to move between segments."""
+    prev_col, next_col = st.columns(2)
+    with prev_col:
+        st.button("Previous", on_click=change_segment_index, args=(-1,), use_container_width=True)
+    with next_col:
+        st.button("Next", on_click=change_segment_index, args=(1,), use_container_width=True)
+
+
+def render_check_and_nav_buttons():
+    """Renders the previous, check and next buttons when a question is displayed."""
+    col_prev_question, col_check, col_next_question = st.columns([1, 4, 1])
+    with col_prev_question:
+        st.button('Previous', use_container_width=True, on_click=change_segment_index, args=(-1,))
+    with col_check:
+        st.button('Check', on_click=process_answer, use_container_width=True, key='Submit')
+    with col_next_question:
+        st.button('Next', use_container_width=True, on_click=change_segment_index, args=(1,))
+
+
+def render_info():
+    """Renders the info segment with title and text."""
+    current_segment = st.session_state.page_content['segments'][st.session_state.segment_index]
+    st.subheader(current_segment['title'])
+    st.write(current_segment['text'])
+
+
+def render_question():
+    """Function to render the question and textbox for the students answer."""
+    # Render the question
+    current_segment = st.session_state.page_content['segments'][st.session_state.segment_index]
+    st.subheader(current_segment['question'])
+    # Render a textbox in which the student can type their answer
+    st.text_area(label='Your answer', label_visibility='hidden', 
+                placeholder="Type your answer",
+                key='student_answer')
+
+
+def learning_phase_page():
+    """
+    Function to display the page that contains the practice questions and 
+    answers without the infobits and with the spaced repetition buttons.
+    """
+    # Fetch user progress in the segments (by index) from the database
+    progress = get_progress()
+
+    # Save current index in session state if it's not already set
+    if 'segment_index' not in st.session_state:
+        st.session_state.segment_index = progress['index']
+
+    # Select the segment that corresponds to the saved index where the user left off
+    current_segment = st.session_state.page_content['segments'][st.session_state.segment_index]
+
+    # Display the info or question in the middle column
+    with mid_col:
+        render_progress_bar(st.session_state.page_content['segments'])
+
+        # Determine what type of segment to display and render interface accordingly
+        if current_segment['type'] == 'info':
+            render_info()
+            render_navigation_buttons()
+        if current_segment['type'] == 'question':
+            render_question()
+            render_check_and_nav_buttons()
+
+
+def practice_phase_page(page_content, module_name):
     """
     Constructs the practice phase page that contains the practice questions 
     that the student didn't answer correctly during the learning phase.
     """
 
-    # Load segments and progress if still on the same page
-    if 'title' not in st.session_state or st.session_state.title != title:
-        st.session_state.title = title
-        st.session_state.segments = segments
+    # # Load segments and progress if still on the same page
+    # if 'title' not in st.session_state or st.session_state.title != title:
+    #     st.session_state.title = title
+    #     st.session_state.segments = segments
 
-        progress = get_progress(st.session_state.name, st.session_state.selected_module, segments)
-        st.session_state.indices = progress['indices']
-        st.session_state.easy_count = progress['easy_count']
+    #     progress = get_progress(st.session_state.student_name, st.session_state.selected_module, segments)
+    #     st.session_state.indices = progress['indices']
+    #     st.session_state.easy_count = progress['easy_count']
 
-        # Initialize session state variables if they don't exist
-        if 'submitted' not in st.session_state:
-            st.session_state.submitted = False
-        if 'answer' not in st.session_state:
-            st.session_state.answer = ""
-        if 'score' not in st.session_state:
-            st.session_state.score = ""
-        if 'feedback' not in st.session_state:
-            st.session_state.feedback = ""
-        if 'difficulty' not in st.session_state:
-            st.session_state.difficulty = ""
-
-    # Read and store current file name
-    st.session_state.current_page_name = __file__
-
-    # Check if a new page is opened
-    if st.session_state.current_page_name != st.session_state.previous_page_name:
-        # Change lists in session state with current week lists
-        initialise_new_page(segments)
-        st.session_state.previous_page_name = st.session_state.current_page_name
+    # # Check if a new page is opened
+    # if st.session_state.current_page_name != st.session_state.previous_page_name:
+    #     # Change lists in session state with current week lists
+    #     initialise_new_page(segments)
+    #     st.session_state.previous_page_name = st.session_state.current_page_name
 
     # Check if the end of the phase is reached and display the message and reset button
     if len(st.session_state.indices) == 0:
@@ -363,11 +390,8 @@ def practice_phase_page(title, segments):
         # Side columns function as margins for the middle column
         side_col1, mid_col, side_col2 = st.columns([1, 6, 1])
         with mid_col:
-            render_progress_bar(segments)
-
-            # Container ensures right placement of question
-            question_cont = st.container()
-            render_question(question_cont)
+            render_progress_bar()
+            render_question()
 
             # Container for a spinner that displays during evaluating answer
             eval_spinner_cont = st.container()
@@ -383,77 +407,91 @@ def practice_phase_page(title, segments):
             render_add_to_practice_buttons()
 
 
-# ====================
+def select_page_type():
+    """
+    Determines what type of page to display based on the selected module.
+    """
+    # For convenience, store the selected module name in a variable
+    module_name = st.session_state.selected_module
 
-# Function to load content from JSON file
-def load_content():
-    with open("./spaced_repetition_questions.json", "r") as f:
-        content = json.load(f)
-    return content
+    # Make module name lowercase and replace spaces and with underscores and cuts off at the first |
+    module_json_name = module_name.split(" |")[0].lower().replace(" ", "_")
 
-# Create a list of possible pages based on the titles in the json file
-def get_pages(content):
-    titles = [page['title'] for page in content]
-
-    return titles
-
-
-# Function to handle page display
-def display_page(page_title, content):
-    page_title = page_title.split(" (")[0]
-
-    # Set selected module as session state
-    st.session_state.selected_module = page_title
-
-    page_idx = next((index for (index, d) in enumerate(content) if d["title"] == page_title), None)
-    if page_idx is not None:
-        page_content = content[page_idx]
-        practice_phase_page(page_content['title'], page_content['segments'])
+    # Find the json with content that corresponds to the selected module
+    with open(f"./modules/{module_json_name}.json", "r") as f:
+        st.session_state.page_content = json.load(f)
+    
+    # Determine what type of page to display
+    if module_name.endswith('practice'):
+        practice_phase_page()
+    elif module_name.endswith('learning'):
+        learning_phase_page()
 
 
-## RENDERING
 
-utils.init_session_state()
+def initialise_session_states():
+    """Initialise the session states."""
 
-if 'answer' not in st.session_state:
-    st.session_state.answer = ""
+    if 'page_content' not in st.session_state:
+        st.session_state.page_content = None
 
-# Init selected module
-if 'selected_module' not in st.session_state:
-    st.session_state.selected_module = None
+    if 'indices' not in st.session_state:
+        st.session_state.indices = []
 
-if 'pages' not in st.session_state:
-    st.session_state.pages = []
+    # Index of current segment (question or info) that user sees
+    if 'segment_index' not in st.session_state:
+        st.session_state.segment_index = 0
 
-if 'segments' not in st.session_state:
-    st.session_state.segments = None
+    if 'authentication_status' not in st.session_state:
+        st.session_state.authentication_status = None
 
-if 'current_question' not in st.session_state:
-    st.session_state.current_question = ''
+    if 'selected_module' not in st.session_state:
+        st.session_state.selected_module = None
 
-if 'current_answer' not in st.session_state:
-    st.session_state.current_answer = ''
+    if 'modules' not in st.session_state:
+        st.session_state.modules = []
 
-if 'show_answer' not in st.session_state:
-    st.session_state.show_answer = False
+    if 'segments' not in st.session_state:
+        st.session_state.segments = None
 
-if 'previous_page_name' not in st.session_state:
-    st.session_state.previous_page_name = None
+    if 'current_question' not in st.session_state:
+        st.session_state.current_question = ''
 
-if 'current_page_name' not in st.session_state:
-    st.session_state.current_page_name = __file__
+    if 'current_answer' not in st.session_state:
+        st.session_state.current_answer = ''
+
+    if 'show_answer' not in st.session_state:
+        st.session_state.show_answer = False
+
+    if 'previous_page_name' not in st.session_state:
+        st.session_state.previous_page_name = None
+
+    if 'current_page_name' not in st.session_state:
+        st.session_state.current_page_name = __file__
+
+    if 'submitted' not in st.session_state:
+        st.session_state.submitted = False
+    
+    if 'answer' not in st.session_state:
+        st.session_state.answer = ""
+        
+    if 'score' not in st.session_state:
+        st.session_state.score = ""
+
+    if 'feedback' not in st.session_state:
+        st.session_state.feedback = ""
+
+    if 'difficulty' not in st.session_state:
+        st.session_state.difficulty = ""
+
+    if 'student_name' not in st.session_state:
+        st.session_state.student_name = None
 
 
 
 # Function to handle authentication check
 def check_authentication():
     if st.session_state["authentication_status"] is False or st.session_state["authentication_status"] is None:
-
-        # courses_header, learnloop_logo = st.columns(2)
-        # with courses_header:
-        #     st.markdown('<p style="font-size: 60px;">Courses</p>', unsafe_allow_html=True)
-        # with learnloop_logo:
-        #     st.image('logo.png', width=100)
 
         # Display 'Courses' header
         st.markdown('<p style="font-size: 60px;"><strong>Courses</strong></p>', unsafe_allow_html=True)
@@ -475,7 +513,9 @@ def check_authentication():
             login_module()
 
         return False
-    return True
+    else:
+        return True
+
 
 def render_logo():
     # Place logo in horizontal centre of sidebar with spacer column
@@ -484,33 +524,102 @@ def render_logo():
         st.image('logo.png', width=100)
 
 
-# Main logic
-if check_authentication():
-    content = load_content()
-    st.session_state.pages = get_pages(content)
-    
+def determine_modules():
+    """	
+    Function to determine which names of modules to display in the sidebar 
+    based on the JSON module files.	
+    """
+    # Determine the modules to display in the sidebar
+    if st.session_state.modules == []:
+        # Read the modules from the modules directory
+        modules = os.listdir("./modules")
+        # Remove the json extension and replace the underscores with spaces
+        modules = [module.replace(".json", "").replace("_", " ") for module in modules]
+        # Capitalize the first letter of each module
+        modules = [module.capitalize() for module in modules]
+        st.session_state.modules = modules
+
+
+def render_sidebar():
+    """	
+    Function to render the sidebar with the modules and login module.	
+    """
     with st.sidebar:
         st.sidebar.title("Ontwikkeling")
-        for option in st.session_state.pages:
-            with st.expander(option):
-                # Display buttons for the two fases in learning with LearnLoop
-                if st.button('Learning Phase 📖', key=option):
-                    st.session_state.selected_module = option
-                if st.button('Practice Phase 📝', key=option + ' practice'):
-                    st.session_state.selected_module = option
+
+        # Determine the modules to display in the sidebar
+        if st.session_state.modules == []:
+            determine_modules()
+
+        # Display the modules in expanders in the sidebar
+        for module in st.session_state.modules:
+            with st.expander(module):
+                # Display buttons for the two types of phases per module
+                if st.button('Learning Phase 📖', key=module + ' learning'):
+                    st.session_state.selected_module = module + ' | learning'
+                if st.button('Practice Phase 📝', key=module + ' practice'):
+                    st.session_state.selected_module = module + ' | practice'
 
         # Display login module at bottom of sidebar after logged in
         login_module()
 
-    # Display correct module
-    if st.session_state.selected_module is None:
-        st.write("Welcome! Please select a module to get started.")
-    else:
-        display_page(st.session_state.selected_module, content)
+
+# MAIN PROGRAM
+if __name__ == "__main__":
+    # Create a mid column with margins in which everything one a page is displayed
+    left_col, mid_col, right_col = st.columns([2, 6, 2])
+    with mid_col:
+        # Container ensures right placement of question
+        question_cont = st.container()
+        # Container for spinner that displays during evaluating answer
+        eval_spinner_cont = st.container()
+
+    initialise_session_states()
+    # Check authentication
+    if check_authentication():
+        render_sidebar()
+
+        # Display correct module
+        if st.session_state.selected_module is None:
+            st.write("Select a module to get started.")
+        else:
+            select_page_type()
 
 
 # ----------------------------------------------------------------------------------------------
 # ARCHIVE
+            
+
+# def render_question():
+#     current_question = st.session_state.segments[st.session_state.indices[0]]['question']
+
+#     # Condition used to indicate if current question is infobit
+#     infobit = bool(st.session_state.segments[st.session_state.indices[0]]['infobit'])
+
+#     # Text input field and submit button
+#     if not st.session_state.submitted and infobit is not True:
+#         st.text_area(label='Your answer', label_visibility='hidden', 
+#                             placeholder="Type your answer",
+#                             key='student_answer')
+
+#     # Display infobit
+#     elif not st.session_state.submitted and infobit:
+#         with question_cont:
+#             info, title, text = current_question.split("//")
+#             st.subheader(title)
+#             st.write(text)
+#         col_prev, col_next = st.columns(2)
+#         with col_prev:
+#             st.button('Previous', use_container_width=True, on_click=change_card_index(1))
+#         with col_next:
+#             st.button('Next', use_container_width=True, on_click=change_card_index(-1))
+#     else:
+#         # Display the submitted text as solid text
+#         with question_cont:
+#             st.subheader(current_question)
+#             st.markdown("<span style='color: grey;'>Your answer:</span>", unsafe_allow_html=True)
+#             st.write(st.session_state.answer)
+
         
 # def practice_phase_page(title, segments):
 #     def change_card_index(index):
