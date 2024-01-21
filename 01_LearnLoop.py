@@ -374,14 +374,26 @@ def learning_phase_page():
         if st.session_state.current_segment['type'] == 'question':
             render_question()
             if st.session_state.submitted:
-                # Display the feedback
-                evaluate_answer()
+                # Spinner that displays during evaluating answer
+                with st.spinner('Evaluating your answer 🔄'):
+                    evaluate_answer()
                 render_feedback()
                 render_explanation()
                 render_add_to_practice_buttons()
             else:
                 render_answerbox()
                 render_check_and_nav_buttons()
+
+    # # Check if the end of the phase is reached and display the message and reset button
+    # if st.session_state.segment_index + 1 == len(st.session_state.page_content['segments']):
+    #     st.title('Done')
+    #     st.write("You've completed the **learning phase** 📖, well done!")
+    #     st.write("To internalise the concepts, you can use the **practice phase** 📝.")
+    #     st.balloons()
+    #     # Restart button
+    #     if st.button('Reset deck'):
+    #         # Trigger full rerender of page
+    #         st.rerun()
 
 
 def practice_phase_page(page_content, module_name):
@@ -494,9 +506,6 @@ def initialise_session_states():
     if 'current_segment' not in st.session_state:
         st.session_state.current_segment = None
 
-    if 'show_answer' not in st.session_state:
-        st.session_state.show_answer = False
-
     if 'previous_page_name' not in st.session_state:
         st.session_state.previous_page_name = None
 
@@ -517,7 +526,6 @@ def initialise_session_states():
 
     if 'difficulty' not in st.session_state:
         st.session_state.difficulty = ""
-
 
 
 # Function to handle authentication check
@@ -594,7 +602,7 @@ def render_sidebar():
     """
     with st.sidebar:
         # Toggle to turn openai request on/off for easier and cheaper testing
-        st.checkbox("Currently testing", value=True, key="currently_testing")
+        st.checkbox("Currently testing", key="currently_testing")
 
         st.sidebar.title("Modules")
 
@@ -617,14 +625,10 @@ def render_sidebar():
 
 # MAIN PROGRAM
 if __name__ == "__main__":
-    # Create a mid column with margins in which everything one a page is displayed
+    # Create a mid column with margins in which everything one a 
+    # page is displayed (referenced to mid_col in functions)
     left_col, mid_col, right_col = st.columns([2, 6, 2])
-    with mid_col:
-        # Container ensures right placement of question
-        question_cont = st.container()
-        # Container for spinner that displays during evaluating answer
-        eval_spinner_cont = st.container()
-
+    
     initialise_session_states()
     
     # Check authentication
