@@ -65,7 +65,7 @@ def upload_progress():
         print("User does not exist, not updating progress")
 
 
-def change_card_index(index):
+def change_card_index(index: int):
     """Function to change the index of the current card in the deck."""
     card_idx = st.session_state.indices.pop(0)
 
@@ -91,22 +91,6 @@ def change_card_index(index):
 def reset_easy_count(current_card):
     st.session_state.easy_count[current_card] = 0
 
-## Answer input field
-def process_answer():
-    # Input in the text area is saved in session state with key "student_answer"
-    input_text = st.session_state.student_answer
-
-    with eval_spinner_cont:
-        with st.spinner('Evaluating your answer...'):
-            current_question = st.session_state.segments[st.session_state.indices[0]]['question']
-            current_answer = st.session_state.segments[st.session_state.indices[0]]['answer']
-            score, feedback = evaluate_answer(input_text, current_question, current_answer)
-    
-    # Store the score and feedback in the session state to access them after the input disappears
-    st.session_state.submitted = True
-    st.session_state.score = score
-    st.session_state.feedback = feedback
-    st.session_state.answer = input_text
 
 def evaluate_answer():
     """Evaluates the answer of the student and returns a score and feedback."""
@@ -169,7 +153,8 @@ def next_question(difficulty):
     upload_progress()
 
 
-def render_feedback():
+def score_to_percentage(score):
+    """Converts a score in the form of a string to a percentage."""
     try:
         # Calculate the score percentage
         part, total = st.session_state.score.split('/')
@@ -183,6 +168,14 @@ def render_feedback():
     except Exception as e:
         st.error(f"Error calculating score: {e}")
         return  # Early exit on error
+    
+    return score_percentage
+
+
+def render_feedback():
+    """Renders the feedback box with the score and feedback."""
+    # Calculate the score percentage
+    score_percentage = score_to_percentage(st.session_state.score)
 
     # Determine color of box based on score percentage
     if score_percentage > 0.75:
@@ -251,14 +244,14 @@ def render_SR_buttons():
         st.button('Next', use_container_width=True)
 
 
-def add_to_practice_phase():
-    """Adds the current segment to the practice phase and changes the current card index."""
-    # Save current segment index to JSON file
-    with open("./progress.json", "w") as f:
-        json.dump({"module_name": st.session_state.selected_module, "segment_index": st.session_state.segment_index}, f)
+# def add_to_practice_phase():
+#     """Adds the current segment to the practice phase and changes the current card index."""
+#     # Save current segment index to JSON file
+#     with open("./progress.json", "w") as f:
+#         json.dump({"module_name": st.session_state.selected_module, "segment_index": st.session_state.segment_index}, f)
     
-    # Change current segment index to the next segment
-    change_segment_index(1)
+#     # Change current segment index to the next segment
+#     change_segment_index(1)
 
 
 def render_add_to_practice_buttons():
@@ -297,6 +290,9 @@ def change_segment_index(step):
         st.session_state.segment_index = 0
     else:
         st.session_state.segment_index = len(segments) - 1
+
+    # Prevent evaluating aswer when navigating to the next or previous segment 
+    st.session_state.submitted = False
     
     # Update database with new index
     upload_progress()
@@ -333,25 +329,38 @@ def render_info():
     st.write(st.session_state.current_segment['text'])
 
 
+def save_student_answer(student_input):
+    st.session_state.student_answer = student_input
+
+
 def render_answerbox():
     """Render a textbox in which the student can type their answer."""
     st.text_area(label='Your answer', label_visibility='hidden', 
                 placeholder="Type your answer",
                 key='student_answer', 
-                on_change=st.session_state.student_answer # Save answer in session state if input changes
+                on_change=save_student_answer # Save answer in session state if input changes
     )
     
 
 def render_question():
     """Function to render the question and textbox for the students answer."""
-    # Render the question
     st.subheader(st.session_state.current_segment['question'])
+
+
+def check_add_to_practice_phase(): #TODO: checken of het werkt en dan connecten met practice phase.
+    """Checks if the current segment should be added to the practice phase."""
+    # Determine if the score is below 100% 
+    if score_to_percentage(st.session_state.score) == 100:
+        # Add segment index of questions that student found difficult to dict coupled to module name
+        st.session_state.practice_questions[st.session_state.selected_module].append(st.session_state.segment_index)
 
 
 def learning_phase_page():
     """
-    Function to display the page that contains the practice questions and 
-    answers without the infobits and with the spaced repetition buttons.
+    Renders the page that takes the student through the concepts of the lecture
+    with info segments and questions. The student can navigate between segments
+    and will get personalized feedback on their answers. Incorrectly answered
+    questions are added to the practice phase.
     """
     # Fetch user progress in the segments (by index) from the database
     db_segment_index = get_progress()["segment_index"]
@@ -378,11 +387,14 @@ def learning_phase_page():
                 with st.spinner('Evaluating your answer 🔄'):
                     evaluate_answer()
                 render_feedback()
+                check_add_to_practice_phase()
                 render_explanation()
-                render_add_to_practice_buttons()
+                render_navigation_buttons()
+                # render_add_to_practice_buttons()
             else:
                 render_answerbox()
                 render_check_and_nav_buttons()
+
 
     # # Check if the end of the phase is reached and display the message and reset button
     # if st.session_state.segment_index + 1 == len(st.session_state.page_content['segments']):
@@ -395,63 +407,13 @@ def learning_phase_page():
     #         # Trigger full rerender of page
     #         st.rerun()
 
-
-def practice_phase_page(page_content, module_name):
+def practice_phase_page():
     """
-    Constructs the practice phase page that contains the practice questions 
-    that the student didn't answer correctly during the learning phase.
+    Renders the page that contains the practice questions and 
+    answers without the info segments and with the spaced repetition buttons.
+    This phase allows the student to practice the concepts they've learned
+    during the learning phase and which they found difficult.
     """
-
-    # # Load segments and progress if still on the same page
-    # if 'title' not in st.session_state or st.session_state.title != title:
-    #     st.session_state.title = title
-    #     st.session_state.segments = segments
-
-    #     progress = get_progress(st.session_state.student_name, st.session_state.selected_module, segments)
-    #     st.session_state.indices = progress['indices']
-    #     st.session_state.easy_count = progress['easy_count']
-
-    # # Check if a new page is opened
-    # if st.session_state.current_page_name != st.session_state.previous_page_name:
-    #     # Change lists in session state with current week lists
-    #     initialise_new_page(segments)
-    #     st.session_state.previous_page_name = st.session_state.current_page_name
-
-    # Check if the end of the phase is reached and display the message and reset button
-    if len(st.session_state.indices) == 0:
-        st.title('Done')
-        st.write("You've completed the **learning phase** 📖, well done!")
-        st.write("To internalise the concepts, you can use the **practice phase** 📝.")
-        st.balloons()
-        # Restart button
-        if st.button('Reset deck'):
-            st.session_state.segments = segments.copy()
-            st.session_state.easy_count = {}
-            st.session_state.indices = list(range(len(segments)))
-            # Trigger full rerender of page
-            st.rerun()
-
-    if len(st.session_state.indices) > 0:
-        # Renders components on page.
-        # Side columns function as margins for the middle column
-        side_col1, mid_col, side_col2 = st.columns([1, 6, 1])
-        with mid_col:
-            render_progress_bar()
-            render_question()
-
-            # Container for a spinner that displays during evaluating answer
-            eval_spinner_cont = st.container()
-
-            # After submission, display the result
-            if st.session_state.submitted:
-                # Display the feedback
-                display_result()
-                render_SR_buttons()
-                render_explanation()
-
-            # REMOVE WHEN CONFIGURING THE PAGES AND BUTTONS CORRECTLY. This function now just displays the buttons.
-            render_add_to_practice_buttons()
-
 
 def select_page_type():
     """
