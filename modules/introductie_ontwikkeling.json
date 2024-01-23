@@ -14,12 +14,12 @@
         {
             "type": "question",
             "question": "Wat is amnesie?",
-            "answer": "Amnesie is een aandoening waarbij mensen moeite hebben met het opslaan en ophalen van herinneringen."
+            "answer": "Amnesie is een aandoening waarbij mensen moeite hebben met het opslaan en ophalen van herinneringen (1 punt) als gevolg van een hersentrauma (1 punt)."
         },
         {
             "type": "info",
-            "title": "Episodisch geheugen",
-            "text": "Episodisch geheugen is het geheugen voor persoonlijke ervaringen. Het is een van de twee belangrijkste soorten geheugen, naast semantisch geheugen, dat gaat over feitenkennis. Episodisch geheugen is een van de eerste soorten geheugen die we verliezen bij dementie."
+            "title": "Semantisch geheugen",
+            "text": "Semantisch geheugen is het geheugen voor feitenkennis. Het is een van de twee belangrijkste soorten geheugen, naast episodisch geheugen, dat gaat over persoonlijke ervaringen. Semantisch geheugen is een van de laatste soorten geheugen die we verliezen bij dementie."
         }
     ]
 }
