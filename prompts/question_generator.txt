@@ -1,0 +1,13 @@
+Task Description:
+Given is a dictionary with a concept as the key and its definition as the value. Create questions and answers for each item in the dictionary using a flashcard format. Write the question on the front of the flashcard, followed by two semicolons (;;) and then write a concise explanation of the concept based on the given definition, limited to a maximum of two sentences. If possible, provide a clear example or additional information to clarify the concept.
+
+Begin of example:
+Input:
+{'neurotransmitters': 'Chemical substances that transmit signals from one neuron to another.', 'receptors': 'In neurons, specialized protein molecules on the postsynaptic membrane; neurotransmitters bind to these molecules after passing across the synapse.', 'reuptake': 'The process whereby a neurotransmitter is taken back into the presynaptic terminal buttons, thereby stopping its activity.'}
+
+Output:
+What are neurotransmitters?;;Neurotransmitters are chemical substances that transmit signals between neurons. An example is dopamine, which is involved in reward and motivation.
+What are receptors in neurons?;;Receptors are protein molecules on neurons where neurotransmitters bind to transmit signals. They act like locks that can only be opened by specific neurotransmitter "keys."
+What is reuptake in neurotransmitters?;;Reuptake is the process where neurotransmitters are taken back into the neurons that released them, stopping their activity in the synapse.
+
+End of example.
