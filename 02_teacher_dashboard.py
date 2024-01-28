@@ -7,6 +7,10 @@ import json
 from login import login_module
 from openai import OpenAI
 client = OpenAI()
+from content_generator import Module
+
+from st_clickable_images import clickable_images
+import base64
 
 load_dotenv()
 
@@ -486,29 +490,50 @@ def initialise_session_states():
         st.session_state.difficulty = ""
 
 
+def get_image_data(image_path):
+    with open(image_path, "rb") as img_file:
+        return base64.b64encode(img_file.read()).decode('utf-8')
+
+def render_clickable_images(image_paths):
+    """Function to render clickable images."""
+    
+    # Convert images to base64 in order for the st-clickable-images package to work
+    image_data = [f"data:image/jpeg;base64,{get_image_data(path)}" for path in image_paths]
+
+    # Display clickable images
+    clicked = clickable_images(
+        image_data,
+        titles=[f"Image #{str(i)}" for i in range(5)],
+        div_style={"display": "flex", "justify-content": "center", "flex-wrap": "wrap"},
+        img_style={"margin": "40px", "height": "100px", "border-radius": "8px"},
+    )
+
+    # Write clicked image number if an image was clicked
+    st.session_state.clicked = clicked
+
+
 # Function to handle authentication check
 def render_start_page():
+    # Check if user is logged in or not
     if st.session_state["authentication_status"] is False or st.session_state["authentication_status"] is None:
+        
+        # Display 'Create Course' header
+        st.markdown('<p style="font-size: 50px;"><strong>Create Course</strong></p>', unsafe_allow_html=True)
 
-        # Display 'How to use' header
-        st.markdown('<p style="font-size: 50px;"><strong>Explanation</strong></p>', unsafe_allow_html=True)
+        # st.markdown('<p style="font-size: 22px;"><strong>Course Name</strong></p>', unsafe_allow_html=True)
+        # Input textbox for course name
+        st.text_input("", placeholder="Enter course name", key="course_name")
 
-        # Display explanation
-        st.write("This app is designed to help you learn concepts easily. It consists of two phases: the **learning phase** and the **practice phase**.")
         # Spacing
         st.write("")
         st.write("")
+        
+        # Display 'Select Lectures' header
+        st.markdown('<p style="font-size: 22px;"><strong>Select Lectures</strong></p>', unsafe_allow_html=True)
+        st.write("Select one of the lectures below to create a module for this course.")
 
-        # Columns to divide the explanation for practice and learning phase
-        learning_col, practice_col = st.columns(2)
-        with learning_col:
-            st.markdown('<p style="font-size: 30px;"><strong>Learning Phase 📖</strong></p>', unsafe_allow_html=True)
-            st.write("The **learning phase** guides you through the concepts of a lecture in an interactive way with personalized feedback. Incorrectly answered questions are added to the practice phase.")
-        with practice_col:
-            st.markdown('<p style="font-size: 30px;"><strong>Practice Phase 📝</strong></p>', unsafe_allow_html=True)
-            st.write("The **practice phase** is where you can practice the concepts you've learned in the **learning phase**. It uses spaced repetition to reinforce your memory and improve long-term retention.")
-        # # Display 'Courses' header
-        # st.markdown('<p style="font-size: 60px;"><strong>Courses</strong></p>', unsafe_allow_html=True)
+        # Render clickable images
+        render_clickable_images(image_paths=["./images/hoorcollege_2_tumbnail.jpg", "./images/hoorcollege_7_tumbnail.jpg", "./images/hoorcollege_x_tumbnail.jpg", "./images/hoorcollege_x2_tumbnail.jpg"])
 
         # # Display courses
         # course_1, course_2 = st.columns(2)
@@ -525,6 +550,15 @@ def render_start_page():
 
             # Login in sidebar
             login_module()
+
+        st.markdown(f"Image #{st.session_state.clicked} clicked" if st.session_state.clicked > -1 else "No image clicked")
+        if st.session_state.clicked > -1:
+            with st.spinner("Generating content for module"):
+                # Determine what lecture was selected
+                lecture_path = f"./study_materials/ml_overview.txt" #TODO: is now hardcoded, but should be an integration with the lectures of the uva
+                new_module = Module(st.session_state.course_name, lecture_path, batch_size=2)
+                new_module.generate_content()
+                st.success("Module generated successfully!")
 
         return False
     else:

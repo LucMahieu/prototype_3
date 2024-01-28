@@ -1,4 +1,6 @@
-import openai
+from openai import OpenAI
+
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 from PyPDF2 import PdfReader
 import streamlit as st
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -18,7 +20,6 @@ import database
 import utils
 
 load_dotenv()
-openai.api_key = st.secrets["OPENAI_API_KEY"]
 print("Starting up with API KEY:", openai.api_key)
 
 st.set_page_config(page_title="LearnLoop", layout="centered")
@@ -228,12 +229,10 @@ def generate_flashcards(_topics, _topics_expanded):
                 Maak 1 Anki flashcard die specifiek en uitsluitend gaat over {topic} binnen de gegeven context {topic_context}
                 """}
         ]
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            temperature=0.7,
-            messages=messages
-        )
-        flashcard_response = response['choices'][0]['message']['content']
+        response = client.chat.completions.create(model="gpt-3.5-turbo",
+        temperature=0.7,
+        messages=messages)
+        flashcard_response = response.choices[0].message.content
         raw_flashcards.append(flashcard_response)
         flashcard_count += 1
         # st.write(topic)

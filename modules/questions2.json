@@ -1,0 +1,154 @@
+{
+    "segments": [
+        {
+            "type": "info",
+            "title": "Supervised Learning",
+            "text": "Supervised learning is a type of machine learning that involves using labeled datasets to train algorithms to classify data or predict outcomes accurately. It includes two main types: classification and regression."
+        },
+        {
+            "type": "question",
+            "question": "What is supervised learning and what are its two main types?",
+            "answer": "Supervised learning is a type of machine learning (1 point) that uses labeled datasets (1 point) to train algorithms (1 point) for classification (1 point) and regression (1 point)."
+        },
+        {
+            "type": "info",
+            "title": "Unsupervised Learning",
+            "text": "Unsupervised learning is a type of machine learning that deals with input data without labeled responses. The goal is to discover intrinsic structures in the data, such as grouping or clustering of data points."
+        },
+        {
+            "type": "question",
+            "question": "What is unsupervised learning?",
+            "answer": "Unsupervised learning is a type of machine learning (1 point) that deals with data without labeled responses (1 point) to discover intrinsic structures like clustering (1 point)."
+        },
+        {
+            "type": "info",
+            "title": "Types of Machine Learning",
+            "text": "Machine learning can be broadly categorized into two types: Supervised learning, which includes tasks like classification and regression, and unsupervised learning, which mainly involves clustering."
+        },
+        {
+            "type": "question",
+            "question": "What are the two main types of machine learning?",
+            "answer": "The two main types of machine learning are supervised learning (1 point), which includes classification and regression, and unsupervised learning (1 point), which involves clustering."
+        },
+        {
+            "type": "info",
+            "title": "Supervised Learning",
+            "text": "Supervised learning is a type of machine learning where the model is trained on labeled data. It includes tasks such as classification, where the model predicts a label from a set of categories, and regression, where the model predicts a continuous value."
+        },
+        {
+            "type": "question",
+            "question": "What is supervised learning and what does it involve?",
+            "answer": "Supervised learning is a type of machine learning (1 point) where the model is trained on labeled data (1 point). It involves tasks such as classification (1 point), where the model predicts a label, and regression (1 point), where the model predicts a continuous value."
+        },
+        {
+            "type": "info",
+            "title": "Unsupervised Learning",
+            "text": "Unsupervised learning is a type of machine learning where the model works on unlabeled data to find patterns. The most common task in unsupervised learning is clustering, which involves grouping data points based on similarity."
+        },
+        {
+            "type": "question",
+            "question": "What is unsupervised learning and its primary task?",
+            "answer": "Unsupervised learning is a type of machine learning (1 point) where the model works on unlabeled data to find patterns (1 point). Its primary task is clustering (1 point), which involves grouping data points based on similarity."
+        },
+        {
+            "type": "info",
+            "title": "Supervised Learning",
+            "text": "Supervised Learning is a type of machine learning where the model is trained on labeled data. The training dataset includes input-output pairs, and the model learns to make predictions or decisions based on this data. For example, it can predict housing prices based on the size of the house using historical data of house prices labeled with their size."
+        },
+        {
+            "type": "question",
+            "question": "What is supervised learning in machine learning?",
+            "answer": "Supervised learning is a type of machine learning (1 point) where the model is trained on labeled data (1 point), using input-output pairs (1 point) to make predictions or decisions (1 point)."
+        },
+        {
+            "type": "info",
+            "title": "Unsupervised Learning",
+            "text": "Unsupervised learning is a type of machine learning where the model is trained on unlabeled data. The system attempts to learn the patterns and the structure from the data without any predefined labels or annotations."
+        },
+        {
+            "type": "question",
+            "question": "What is unsupervised learning in machine learning?",
+            "answer": "Unsupervised learning is a machine learning approach (1 point) where the model is trained on unlabeled data (1 point) and tries to learn patterns and structure (1 point) without any predefined labels or annotations (1 point)."
+        },
+        {
+            "type": "info",
+            "title": "Classification in Supervised Learning",
+            "text": "A supervised learning task known as classification involves predicting the class or category of an object or sample based on its features. Classification algorithms are used when the output is a category, such as 'spam' or 'not spam', and 'fraudulent' or 'not fraudulent'. The algorithm learns from the training data and uses that knowledge to classify new, unseen data. An example of a classification task is Email Spam Detection, which involves classifying emails as spam or not."
+        },
+        {
+            "type": "question",
+            "question": "What is classification in the context of supervised learning?",
+            "answer": "Classification is a supervised learning task (1 point) that involves predicting the category of an object (1 point) based on its features (1 point). It is used when the output is a category like 'spam' or 'not spam' (1 point)."
+        },
+        {
+            "type": "info",
+            "title": "k-Nearest Neighbours (k-NN)",
+            "text": "k-Nearest Neighbours (k-NN) is a classification algorithm used for classifying objects based on the closest training examples in the feature space. It operates by finding the k training examples nearest to the new data point and assigning the most common class among those k examples to the new data."
+        },
+        {
+            "type": "question",
+            "question": "What is the k-Nearest Neighbours (k-NN) algorithm?",
+            "answer": "k-NN is a classification algorithm (1 point) that classifies objects based on the closest training examples in the feature space (1 point). It assigns the class by looking at the most common class among the k nearest examples to the new data point (1 point)."
+        },
+        {
+            "type": "info",
+            "title": "Naive Bayes",
+            "text": "Naive Bayes is a classification algorithm that assumes independence among predictors. It calculates the probability of each category based on the features and assigns the category with the highest probability to the new data point. Despite its simplicity, Naive Bayes can be particularly effective in certain applications."
+        },
+        {
+            "type": "question",
+            "question": "What is the Naive Bayes algorithm?",
+            "answer": "Naive Bayes is a classification algorithm (1 point) that assumes independence among predictors (1 point). It calculates the probability of each category based on the features (1 point) and assigns the category with the highest probability to the new data (1 point)."
+        },
+        {
+            "type": "info",
+            "title": "Types of Machine Learning",
+            "text": "Machine Learning can be broadly categorized into two main types: Supervised Learning, which includes tasks such as classification and regression, and Unsupervised Learning, which includes clustering."
+        },
+        {
+            "type": "question",
+            "question": "What are the two main types of machine learning and what tasks do they include?",
+            "answer": "The two main types of machine learning are Supervised Learning (1 point), which includes tasks like classification and regression (1 point), and Unsupervised Learning (1 point), which includes tasks like clustering (1 point)."
+        },
+        {
+            "type": "info",
+            "title": "Supervised Learning",
+            "text": "Supervised Learning is a type of machine learning where the model is trained on labeled data. It involves learning a function that maps an input to an output based on example input-output pairs. It includes tasks such as classification, where the output is a label, and regression, where the output is a continuous value."
+        },
+        {
+            "type": "question",
+            "question": "What is Supervised Learning in machine learning?",
+            "answer": "Supervised Learning is a type of machine learning (1 point) where the model is trained on labeled data (1 point). It involves learning a function that maps input to output based on example input-output pairs (1 point). It includes tasks like classification, where the output is a label (0.5 point), and regression, where the output is a continuous value (0.5 point)."
+        },
+        {
+            "type": "info",
+            "title": "Unsupervised Learning",
+            "text": "Unsupervised Learning is a type of machine learning where the model works on unlabeled data. The system tries to learn the patterns and structure from the data without any explicit instructions. A common task in unsupervised learning is clustering, where the model groups similar data points together."
+        },
+        {
+            "type": "question",
+            "question": "What is Unsupervised Learning in machine learning?",
+            "answer": "Unsupervised Learning is a type of machine learning (1 point) where the model works on unlabeled data (1 point). It tries to learn patterns and structure from the data without explicit instructions (1 point). A common task is clustering, where the model groups similar data points together (1 point)."
+        },
+        {
+            "type": "info",
+            "title": "Supervised Learning",
+            "text": "Supervised learning is a type of machine learning where the model is trained on labeled data. The training dataset includes input-output pairs, and the model learns to make predictions or decisions based on this data. An example of supervised learning is predicting housing prices based on the size of the house using historical data of house prices labeled with their sizes."
+        },
+        {
+            "type": "question",
+            "question": "What is supervised learning in machine learning?",
+            "answer": "Supervised learning is a type of machine learning (1 point) where the model is trained on labeled data (1 point), using input-output pairs (1 point) to make predictions or decisions (1 point)."
+        },
+        {
+            "type": "info",
+            "title": "Definition",
+            "text": "Definition is a type of machine learning where the model is trained on unlabeled data, and the system tries to learn the patterns and the structure from the data without any labels."
+        },
+        {
+            "type": "question",
+            "question": "What is the definition machine learning approach?",
+            "answer": "Definition is a machine learning approach (1 point) where the model is trained on unlabeled data (1 point), and the system learns patterns and structure from the data (1 point) without any labels (1 point)."
+        }
+    ]
+}

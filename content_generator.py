@@ -1,144 +1,105 @@
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
+import tqdm
+import json
 
 load_dotenv()
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-load_dotenv()
-
-def openai_call(system_message, user_message="", model='gpt-4', temp=0.0):
-    message = [
-        {"role": "system", "content": system_message},
-        {"role": "user", "content": user_message}
-    ]
-    response = client.chat.completions.create(model=model,
-    temperature=temp,
-    messages=message, response_format="json")
-
-    return response.choices[0].message.content
+class Module:
+    def __init__(self, name, lecture_path, batch_size):
+        self.name = name
+        self.lecture_path = lecture_path
+        self.batch_size = batch_size
 
 
-def strip_empty_lines(text):
-    return "\n".join(line.strip() for line in text.splitlines() if line.strip())
+    def openai_call(self, system_message, user_message, model='gpt-3.5-turbo-1106', temp=0.0):
+        message = [
+            {"role": "system", "content": system_message},
+            {"role": "user", "content": user_message}
+        ]
+        response = client.chat.completions.create(model=model,
+        temperature=temp,
+        messages=message, response_format={"type": "json_object"})
+
+        return response.choices[0].message.content
 
 
-def batch_generator(data, batch_size):
-    """
-    Chunk the study materials into batches so they fit in the context window of the LLM.
-    """
-    # Zorg ervoor dat data een dictionary is en batch_size een positief getal.
-    assert isinstance(data, dict) and batch_size > 0, "Ongeldige input"
-
-    # Tijdelijke opslag voor de huidige batch.
-    current_batch = {}
-
-    # Loop door elk item in de data.
-    for term, definition in data.items():
-        # Voeg het item toe aan de huidige batch.
-        current_batch[term] = definition
-
-        # Als de huidige batch de gewenste grootte heeft bereikt,
-        # geef deze dan terug en reset de huidige batch.
-        if len(current_batch) == batch_size:
-            yield current_batch
-            current_batch = {}
-
-    # Als er items over zijn in de huidige batch na het eindigen van de loop, geef deze dan ook terug.
-    if current_batch:
-
-        yield current_batch
+    def batch_generator(self, glossary):
+        lines = ""
+        glossary_lines = glossary.split("\n")
+        for i, line in enumerate(glossary_lines):
+            lines += line
+            if i % self.batch_size == 0 and i != 0:
+                yield lines
+                lines = ""
 
 
-def glossary_to_dict(glossary):
-    glossary_dict = {}
-    glossary_lines = glossary.splitlines()
-    for i, line in enumerate(glossary_lines):
-        line = line.strip()  # Verwijder whitespace aan het begin en eind van de lijn
-        if i % 2 == 0:
-            key = line
-        else:
-            glossary_dict[key] = line
-    return glossary_dict
+    def add_response_to_json_file(self, json_response_string, module_name):
+        # Turn json string into python object
+        json_response = json.loads(json_response_string)
 
 
-def question_generator(dict, batch_size):
-    questions = ""
-    i = 1
-    for batch in batch_generator(dict, batch_size):
-        print(f"GENERATING BATCH {i}")
-        i += 1
-
-        # Load instructions for question generator
-        with open("./prompts/question_generator.txt", "r") as f:
-            system_message = f.read()
         
-        # Input study materials
-        user_message = f""" 
-            Input: 
-            {batch}
+        if os.path.exists("./modules/questions.json"):
+            print("File exists")
+            # Open json file to read existing content
+            with open("./modules/questions.json", "r") as f:
+                content = json.load(f)
             
-            Output:
-        """
-
-        response = openai_call(system_message, user_message, model='gpt-3.5-turbo-1106', temp=0.7)
-
-        cleaned_response = strip_empty_lines(response)
-
-        # Ensure the new response is added on a new line
-        if not cleaned_response.endswith("\n"):
-            cleaned_response += "\n"
-        questions += cleaned_response
-
-    return questions
-
-
-def format_questions(raw_text):
-    # Initialiseren van de lists.
-    questions = []
-    answers = []
-
-    # Opsplitsen van de raw_text string in afzonderlijke questions.
-    questions = raw_text.strip().split("\n")
-
-    # Itereren over elke question.
-    for card in questions:
-        if ";;" not in card:
-            print(f"WARNING: {card} is not a valid question. It will be skipped.")
-            continue
+            # Check if 'segments' key already exists
+            if 'segments' in content:
+                # Add the new segments to the existing segments
+                content['segments'].extend(json_response['segments'])
+            else:
+                # Create the 'module name' key and assign the module name
+                content['module_name'] = module_name
+                # Create 'segments' key and assign the new segments
+                content['segments'] = json_response['segments']
         else:
-            # Splitsen van de question in vraag en antwoord met behulp van ";;".
-            question, answer = card.split(";;")
+            # Create json file with the module name and response
+            content = {}
+            content['module_name'] = module_name
+            content['segments'] = json_response['segments']
 
-        # Toevoegen van vraag en antwoord aan hun respectieve lijsten.
-        questions.append(question.strip())
-        answers.append(answer.strip())
-
-    return questions, answers
-
-def run_generator(glossary):
-    # cleaned_glossary = strip_empty_lines(glossary)
-    glossary_dict = glossary_to_dict(glossary)
-
-    # Generate questions
-    questions = question_generator(glossary_dict, batch_size)
-
-    # Split questions in questions and answers lists
-    questions, answers = format_questions(questions)
-    print(f"EINDPRODUCT QUESTIONS: {questions}")
-    print(f"EINDPRODUCT ANSWERS: {answers}")
+        # Write the new content to the json file
+        with open("./modules/questions.json", "w") as f:
+            json.dump(content, f, indent=4)
 
 
-if __name__ == "__main__":
-    # Size of the batches that go in question generator
-    batch_size = 8
+    def generate_content(self):
+        # Load glossary from lecture path txt file
+        with open(f"{self.lecture_path}", "r") as f:
+            glossary = f.read()
 
-    # Load glossary from txt file
-    with open("./study_materials/ml_overview.txt", "r") as f:
-        glossary = f.read()
-    
-    # Generate questions
-    run_generator(glossary)
+        for batch in self.batch_generator(glossary):
 
-    
+            if batch == "":
+                print("Batch is empty")
+                break
+            else:
+                print(f"Batch: {batch}")
+            # Load instructions for question generator
+            with open("./prompts/generate_content.txt", "r") as f:
+                system_message = f.read()
+            
+            # Input study materials
+            user_message = f""" 
+                Input: 
+                {batch}
+                
+                Output:
+            """
+
+            json_response = self.openai_call(system_message, user_message, model='gpt-4-1106-preview', temp=0.7)
+
+            self.add_response_to_json_file(json_response, module_name="ml_overview") #TODO: Change module name to be variable
+
+
+    if __name__ == "__main__":
+        lecture_path = "./modules/ml_overview/lecture.txt"
+        generate_content(lecture_path, batch_size=2)
+
+        
