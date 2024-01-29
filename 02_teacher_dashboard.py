@@ -440,6 +440,12 @@ def select_page_type():
 def initialise_session_states():
     """Initialise the session states."""
 
+    if 'generate_button' not in st.session_state:
+        st.session_state.generate_button = False
+
+    if 'generate_course' not in st.session_state:
+        st.session_state.generate_course = False
+
     if 'easy_count' not in st.session_state:
         st.session_state.easy_count = {}
 
@@ -534,31 +540,31 @@ def render_start_page():
 
         # Render clickable images
         render_clickable_images(image_paths=["./images/hoorcollege_2_tumbnail.jpg", "./images/hoorcollege_7_tumbnail.jpg", "./images/hoorcollege_x_tumbnail.jpg", "./images/hoorcollege_x2_tumbnail.jpg"])
-
-        # # Display courses
-        # course_1, course_2 = st.columns(2)
-        # with course_1:
-        #     st.image('neuropsycho.png')
-        # with course_2:
-        #     st.image('neuropsycho.png')
-
-        # Load login module at top of sidebar, but remove from top when logged in
-        with st.sidebar:
-
-            # Place logo in horizontal centre of sidebar
-            render_logo()
-
-            # Login in sidebar
-            login_module()
-
-        st.markdown(f"Image #{st.session_state.clicked} clicked" if st.session_state.clicked > -1 else "No image clicked")
+        
         if st.session_state.clicked > -1:
-            with st.spinner("Generating content for module"):
-                # Determine what lecture was selected
-                lecture_path = f"./study_materials/ml_overview.txt" #TODO: is now hardcoded, but should be an integration with the lectures of the uva
-                new_module = Module(st.session_state.course_name, lecture_path, batch_size=2)
+            print()
+            st.session_state.generate_button = True
+            st.button("Generate course", key="generate_course")
+            if st.session_state.generate_course == True:
+                st.session_state.generate_button = False
+        
+        if st.session_state.generate_course:
+        # st.markdown(f"Image #{st.session_state.clicked} clicked" if st.session_state.clicked > -1 else "No image clicked")
+        # if st.session_state.clicked > -1:
+            with st.spinner("Collecting content and transforming into module"):
+                transcript_path = "./study_materials/lecture_1_transcript.txt"
+                glossary_path = "./glossaries/lecture_1_glossary.txt"
+                module_name = "amnesie"
+                content_path = f"./modules/{module_name}.json"
+
+                new_module = Module(module_name, transcript_path, glossary_path, content_path, batch_size=2)
+                new_module.generate_glossary()
                 new_module.generate_content()
                 st.success("Module generated successfully!")
+                st.button("See module", key="see_module")
+                st.session_state.selected_module = st.session_state.module_name + ' | learning'
+                select_page_type()
+                st.rerun()
 
         return False
     else:
@@ -623,23 +629,25 @@ if __name__ == "__main__":
     
     initialise_session_states()
     
-    # Check authentication
-    if render_start_page():
-        render_sidebar()
+    render_start_page()
 
-        # Display correct module
-        if st.session_state.selected_module is None:
+    # # Check authentication
+    # if render_start_page():
+    #     render_sidebar()
+
+    #     # Display correct module
+    #     if st.session_state.selected_module is None:
             
-            # Column to centre the start button in the middle of the page
-            start_col = st.columns(3)
-            with start_col[0]:
-                st.subheader("Start where you left off")
+    #         # Column to centre the start button in the middle of the page
+    #         start_col = st.columns(3)
+    #         with start_col[0]:
+    #             st.subheader("Start where you left off")
             
-                # Create button to start learning phase of first module
-                if st.button('Start', key='start', use_container_width=True):
-                    st.session_state.selected_module = st.session_state.modules[0] + ' | learning'
+    #             # Create button to start learning phase of first module
+    #             if st.button('Start', key='start', use_container_width=True):
+    #                 st.session_state.selected_module = st.session_state.modules[0] + ' | learning'
                     
-                    # Rerun to make sure the page is displayed directly after start button is clicked
-                    st.rerun()
-        else:
-            select_page_type()
+    #                 # Rerun to make sure the page is displayed directly after start button is clicked
+    #                 st.rerun()
+    #     else:
+    #         select_page_type()

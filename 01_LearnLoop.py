@@ -353,11 +353,6 @@ def learning_phase_page():
     and will get personalized feedback on their answers. Incorrectly answered
     questions are added to the practice phase.
     """
-    # Check if the progress of the page has been saved to the database previously
-    # if 
-    #     # Save progress to db
-    #     upload_progress()
-
     # Fetch user progress in the segments (by index) from the database
     db_segment_index = get_progress()["segment_index"]
 
