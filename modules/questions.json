@@ -1716,6 +1716,79 @@
             "type": "question",
             "question": "What is multivariate linear regression?",
             "answer": "Multivariate linear regression is a statistical method (1 point) that involves multiple independent variables (1 point) to predict the dependent variable (1 point) and finds the linear relationship between them (1 point)."
+        },
+        {
+            "type": "info",
+            "title": "Hippocampus-Cortex Dialogue and Memory Consolidation",
+            "text": "The model of memory consolidation that the lecture refers to involves an interaction between the hippocampus and the cortex. The hippocampus serves as a central hub for new memories and exhibits significant plasticity and connectivity with the rest of the brain. Synaptic changes occur in the hippocampus with the help of neuromodulators such as acetylcholine, which is essential for securing long-term memory."
+        },
+        {
+            "type": "question",
+            "question": "How does the hippocampus contribute to memory consolidation according to the model referred to in the lecture?",
+            "answer": "The hippocampus serves as a central hub for new memories (1 point), exhibits significant plasticity and connectivity with the rest of the brain (1 point), and undergoes synaptic changes with the help of neuromodulators such as acetylcholine (1 point), which is essential for securing long-term memory (1 point)."
+        },
+        {
+            "type": "info",
+            "title": "Clive Wearing's Case and the Role of the Hippocampus",
+            "text": "Clive Wearing's case illustrates the crucial role of the hippocampus in forming long-term memories. Due to damage to his hippocampus, Clive is unable to form explicit memories that are consciously accessible, leading to a dissociation with consciousness where he can learn new things without being aware of it."
+        },
+        {
+            "type": "question",
+            "question": "Why is Clive Wearing unable to form new long-term memories?",
+            "answer": "Clive Wearing is unable to form new long-term memories because he lacks a functioning hippocampus (1 point), which is essential for creating explicit memories that are consciously accessible (1 point). As a result, there is a dissociation with consciousness (1 point)."
+        },
+        {
+            "type": "info",
+            "title": "Impliciet versus Expliciet Geheugen",
+            "text": "Impliciet geheugen verwijst naar het onbewuste geheugen voor vaardigheden en hoe dingen gedaan worden, zoals fietsen of pianospelen. Expliciet geheugen daarentegen is het bewuste geheugen voor feitelijke informatie en persoonlijke ervaringen, zoals het herinneren van een verjaardag of een gebeurtenis uit de geschiedenis."
+        },
+        {
+            "type": "question",
+            "question": "Wat is het verschil tussen impliciet en expliciet geheugen?",
+            "answer": "Impliciet geheugen is onbewust en voor vaardigheden en procedures (1 point), terwijl expliciet geheugen bewust is en voor feitelijke informatie en persoonlijke ervaringen (1 point)."
+        },
+        {
+            "type": "info",
+            "title": "Impliciete Herinneringen en de Cortex",
+            "text": "De cortex kan impliciete herinneringen vastleggen zonder de hulp van de hippocampus. Deze herinneringen vormen geen bewuste episodes en zijn onbewust. Dit suggereert dat voor bewuste toegang tot het geheugen, geheugensporen die via de hippocampus zijn gevormd nodig zijn. De exacte reden waarom dit gebeurt, is nog niet volledig begrepen."
+        },
+        {
+            "type": "question",
+            "question": "Wat zijn impliciete herinneringen en hoe worden ze vastgelegd?",
+            "answer": "Impliciete herinneringen zijn herinneringen die onbewust zijn en geen bewuste episodes vormen (1 point). Ze kunnen worden vastgelegd door de cortex zonder de hulp van de hippocampus (1 point)."
+        },
+        {
+            "type": "info",
+            "title": "Geheugensysteem",
+            "text": "Het geheugensysteem omvat verschillende processen en regio's in de hersenen, waaronder een 'links systeem', bekend als de hippocampus, en een 'trace systeem', waar uiteindelijk alle herinneringen worden opgeslagen. Daarnaast speelt een modulatoiresysteem, diep in het voorbrein, een rol door het verspreiden van belangrijke stoffen zoals neuro-acetylcholine, welke essentieel zijn voor dit proces."
+        },
+        {
+            "type": "question",
+            "question": "Wat houdt het geheugensysteem in en welke onderdelen zijn erbij betrokken?",
+            "answer": "Het geheugensysteem omvat de hippocampus als het 'links systeem' (1 point) en een 'trace systeem' voor het opslaan van herinneringen (1 point). Een modulatoiresysteem in het voorbrein verspreidt stoffen zoals neuro-acetylcholine voor dit proces (1 point)."
+        },
+        {
+            "type": "info",
+            "title": "Geheugensporen",
+            "text": "Geheugensporen verwijzen naar de fysieke en chemische veranderingen in de hersenen die geassocieerd zijn met het opslaan van herinneringen. Deze sporen worden gevormd en opgeslagen in het 'trace systeem' van de hersenen."
+        },
+        {
+            "type": "question",
+            "question": "Wat zijn geheugensporen?",
+            "answer": "Geheugensporen zijn fysieke en chemische veranderingen in de hersenen (1 point) die geassocieerd zijn met het opslaan van herinneringen (1 point)."
+        },
+        {
+            "type": "info",
+            "title": "Verband met Alzheimer en Acetylcholine",
+            "text": "Acetylcholine is een neurotransmitter die een belangrijke rol speelt in het geheugen en het leerproces. Een tekort aan acetylcholine wordt vaak geassocieerd met de ziekte van Alzheimer, een hersenaandoening die leidt tot geheugenverlies en cognitieve achteruitgang."
+        },
+        {
+            "type": "question",
+            "question": "Wat is het verband tussen Acetylcholine en Alzheimer?",
+            "answer": {
+                "content": "Acetylcholine is een neurotransmitter die belangrijk is voor geheugen en leren (1 punt). Een tekort eraan wordt geassocieerd met de ziekte van Alzheimer (1 punt), wat leidt tot geheugenverlies en cognitieve achteruitgang (1 punt).",
+                "points": 3
+            }
         }
     ]
 }

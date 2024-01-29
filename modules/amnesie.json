@@ -1,0 +1,75 @@
+{
+    "module_name": "Amnesie",
+    "segments": [
+        {
+            "type": "info",
+            "title": "Consolidatie en Hippocampus-Cortex Dialoog",
+            "text": "Consolidatie is een cruciaal proces in het geheugen waarbij een nieuwe herinnering wordt gevormd. Tijdens dit proces wordt de herinnering tijdelijk in de hippocampus vastgehouden. De hippocampus fungeert als een hub met een hoge mate van plasticiteit en connectiviteit met de rest van de hersenen, wat essentieel is voor het bij elkaar houden en het aanpassen van synapsen voor het vormen van nieuwe herinneringen."
+        },
+        {
+            "type": "question",
+            "question": "Wat is consolidatie in de context van geheugen en wat is de rol van de hippocampus hierin?",
+            "answer": "Consolidatie is het proces waarbij een nieuwe herinnering wordt gevormd en tijdelijk in de hippocampus wordt vastgehouden (1 point). De hippocampus dient als een hub met hoge plasticiteit en connectiviteit (1 point), wat cruciaal is voor het bij elkaar houden en aanpassen van synapsen voor nieuwe herinneringen (1 point)."
+        },
+        {
+            "type": "info",
+            "title": "Plasticiteit",
+            "text": "Plasticiteit verwijst naar de mogelijkheid van synapsen in de hersenen om te veranderen en zich aan te passen. Dit is essentieel voor de vorming en consolidatie van herinneringen."
+        },
+        {
+            "type": "question",
+            "question": "Wat is plasticiteit en waarom is het belangrijk?",
+            "answer": "Plasticiteit is de mogelijkheid van synapsen om te veranderen en aan te passen (1 point), wat essentieel is voor het vormen en consolideren van herinneringen (1 point)."
+        },
+        {
+            "type": "info",
+            "title": "Neuromodulatoren",
+            "text": "Neuromodulatoren zijn chemische stoffen die de plasticiteit van synapsen be\u00efnvloeden. Een voorbeeld hiervan is acetylcholine, dat een hoge concentratie vereist voor het veiligstellen van langetermijngeheugen."
+        },
+        {
+            "type": "question",
+            "question": "Wat zijn neuromodulatoren en wat is hun rol bij het geheugen?",
+            "answer": "Neuromodulatoren zijn chemische stoffen (1 point) die de plasticiteit van synapsen be\u00efnvloeden (1 point), zoals acetylcholine, dat belangrijk is voor het langetermijngeheugen (1 point)."
+        },
+        {
+            "type": "info",
+            "title": "Het Belang van de Hippocampus voor Bewust Geheugen",
+            "text": "De cortex kan impliciete herinneringen vastleggen, maar voor het bewust benaderen van geheugen is de hippocampus essentieel. Herinneringssporen gevormd via de hippocampus stellen ons in staat om bewust toegang te krijgen tot onze geheugens, en zonder de hippocampus, zoals in het geval van Clive Wearing, is dit niet mogelijk."
+        },
+        {
+            "type": "question",
+            "question": "Waarom is de hippocampus essentieel voor bewust geheugen?",
+            "answer": "De hippocampus is essentieel voor bewust geheugen omdat het ons in staat stelt om bewust toegang te krijgen tot onze geheugens (1 point). Zonder de hippocampus kunnen we geen bewuste herinneringen benaderen (1 point), zoals ge\u00efllustreerd door het geval van Clive Wearing (1 point)."
+        },
+        {
+            "type": "info",
+            "title": "Dissociatie tussen Leren en Bewustzijn",
+            "text": "Dissociatie tussen leren en bewustzijn verwijst naar het verschijnsel waarbij een persoon het vermogen kan hebben om nieuwe dingen te leren zonder zich bewust te zijn van dat leren. Een bekend voorbeeld is Clive Wearing, die ondanks het missen van zijn hippocampus, nieuwe informatie kon leren, maar zich hier niet bewust van was. Dit illustreert een scheiding tussen impliciet leren en bewust geheugen."
+        },
+        {
+            "type": "question",
+            "question": "Wat illustreert het geval van Clive Wearing over dissociatie tussen leren en bewustzijn?",
+            "answer": "Het geval van Clive Wearing illustreert dat iemand nieuwe dingen kan leren zonder zich daar bewust van te zijn (1 point), wat een scheiding aantoont tussen impliciet leren en bewust geheugen (1 point)."
+        },
+        {
+            "type": "info",
+            "title": "Links en Trace Systeem in het Geheugen",
+            "text": "Het geheugen omvat een links systeem, dat bestaat uit de hippocampus die bilateraal werkt, en een trace systeem, waar uiteindelijk geheugensporen worden opgeslagen. De modulatie van deze systemen gebeurt in de diepere delen van het voorbrein."
+        },
+        {
+            "type": "question",
+            "question": "Wat houdt het links en trace systeem in het geheugen in?",
+            "answer": "Het links systeem bestaat uit de hippocampus die bilateraal werkt (1 point) en het trace systeem is waar geheugensporen worden opgeslagen (1 point). De modulatie vindt plaats in diepere delen van het voorbrein (1 point)."
+        },
+        {
+            "type": "info",
+            "title": "Invloed van Acetylcholine en Alzheimer",
+            "text": "Een lage acetylcholinespiegel, zoals waargenomen in vroege stadia van Alzheimer, kan leiden tot amnesie. Medicijnen die gericht zijn op het herstellen van de acetylcholinespiegel worden ingezet tegen vroege verschijnselen van Alzheimer, maar deze hebben wisselend succes en kunnen bijwerkingen hebben."
+        },
+        {
+            "type": "question",
+            "question": "Hoe is acetylcholine gerelateerd aan Alzheimer en wat is het effect van medicijnen die de acetylcholinespiegel be\u00efnvloeden?",
+            "answer": "Een lage acetylcholinespiegel wordt waargenomen in vroege stadia van Alzheimer en kan amnesie veroorzaken (1 point). Medicijnen die de acetylcholinespiegel verhogen, worden gebruikt om de vroege symptomen van Alzheimer te behandelen (1 point), maar hebben wisselend succes en kunnen bijwerkingen hebben (1 point)."
+        }
+    ]
+}
