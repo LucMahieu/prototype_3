@@ -542,7 +542,6 @@ def render_start_page():
         render_clickable_images(image_paths=["./images/hoorcollege_2_tumbnail.jpg", "./images/hoorcollege_7_tumbnail.jpg", "./images/hoorcollege_x_tumbnail.jpg", "./images/hoorcollege_x2_tumbnail.jpg"])
         
         if st.session_state.clicked > -1:
-            print()
             st.session_state.generate_button = True
             st.button("Generate course", key="generate_course")
             if st.session_state.generate_course == True:

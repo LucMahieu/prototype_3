@@ -73,6 +73,7 @@ class Module:
     def generate_glossary(self):
         """Generates a glossary of topics from the lecture transcript and stores 
         them as attribute for further processing."""
+        print("Generating glossary")
         with open("./prompts/transcript_to_glossary.txt", "r") as f:
             system_message = f.read()
         

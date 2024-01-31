@@ -70,6 +70,56 @@
             "type": "question",
             "question": "Hoe is acetylcholine gerelateerd aan Alzheimer en wat is het effect van medicijnen die de acetylcholinespiegel be\u00efnvloeden?",
             "answer": "Een lage acetylcholinespiegel wordt waargenomen in vroege stadia van Alzheimer en kan amnesie veroorzaken (1 point). Medicijnen die de acetylcholinespiegel verhogen, worden gebruikt om de vroege symptomen van Alzheimer te behandelen (1 point), maar hebben wisselend succes en kunnen bijwerkingen hebben (1 point)."
+        },
+        {
+            "type": "info",
+            "title": "Hippocampus-Cortex Dialogue and Memory Consolidation",
+            "text": "The discussed model emphasizes the interaction between the hippocampus and the cortex during the process of memory consolidation. After learning new information, the hippocampus plays a central role as a hub where newly acquired memories are temporarily held and where synaptic changes occur, a process called plasticity, which is essential for neuromodulators such as acetylcholine."
+        },
+        {
+            "type": "question",
+            "question": "What is the role of the hippocampus in memory consolidation?",
+            "answer": "The hippocampus acts as a central hub (1 point) where newly acquired memories are temporarily held (1 point) and where synaptic changes, known as plasticity, take place (1 point), which is essential for neuromodulators such as acetylcholine (1 point)."
+        },
+        {
+            "type": "info",
+            "title": "Bouwstijger Concept voor Langetermijngeheugen",
+            "text": "De lezing introduceert het 'bouwstijger' concept voor het langetermijngeheugen. Dit concept beschrijft het proces van het veiligstellen en consolideren van langetermijngeheugen in de hippocampus. Vergelijkbaar met hoe een bouwstijger een structuur ondersteunt tijdens constructie, ondersteunt de hippocampus het vormen van langetermijnherinneringen totdat ze geconsolideerd zijn."
+        },
+        {
+            "type": "question",
+            "question": "Wat houdt het 'bouwstijger' concept voor langetermijngeheugen in?",
+            "answer": "Het 'bouwstijger' concept beschrijft het proces van veiligstellen en consolideren van langetermijngeheugen in de hippocampus (1 point) waarbij de hippocampus functioneert als ondersteuning (1 point) totdat herinneringen geconsolideerd zijn (1 point)."
+        },
+        {
+            "type": "info",
+            "title": "Clive Wearing en Langetermijngeheugen",
+            "text": "Clive Wearing is een voorbeeld van iemand die niet in staat is tot het proces van het consolideren van langetermijngeheugen vanwege een beschadigde hippocampus. Dit illustreert het belang van de hippocampus in het 'bouwstijger' concept voor het langetermijngeheugen."
+        },
+        {
+            "type": "question",
+            "question": "Waarom kan Clive Wearing geen langetermijngeheugen consolideren?",
+            "answer": "Clive Wearing kan geen langetermijngeheugen consolideren omdat zijn hippocampus beschadigd is (1 point), wat cruciaal is voor het consolidatieproces volgens het 'bouwstijger' concept (1 point)."
+        },
+        {
+            "type": "info",
+            "title": "Rol van de Cortex bij Geheugen",
+            "text": "De cortex kan zelfstandig bepaalde types van impliciet geheugen vastleggen, zoals reflexen of gewoonten, die niet bewust worden ervaren en geen episodische herinneringen vormen. Echter, voor het bewust benaderen van het geheugen zijn geheugensporen noodzakelijk die via de hippocampus worden gevormd."
+        },
+        {
+            "type": "question",
+            "question": "Wat is de rol van de cortex bij het vastleggen van geheugen?",
+            "answer": "De cortex kan bepaalde types van impliciet geheugen vastleggen zoals reflexen of gewoonten (1 point) die niet bewust worden ervaren (1 point) en geen episodische herinneringen vormen (1 point). Voor het bewust benaderen van het geheugen zijn geheugensporen nodig die via de hippocampus worden gevormd (1 point)."
+        },
+        {
+            "type": "info",
+            "title": "Onbegrip over Specifieke Mechanismen",
+            "text": "Er is nog steeds een gebrek aan volledig begrip over waarom alleen geheugensporen die door de hippocampus zijn gevormd, bewust kunnen worden benaderd. Dit wijst op bestaande onduidelijkheid omtrent de specifieke mechanismen die betrokken zijn bij geheugenconsolidatie en -toegang."
+        },
+        {
+            "type": "question",
+            "question": "Waarom is er onbegrip over specifieke mechanismen in het geheugenproces?",
+            "answer": "Er is onbegrip omdat het niet volledig begrepen is waarom alleen geheugensporen gevormd door de hippocampus (1 point) bewust benaderd kunnen worden (1 point), wat wijst op onduidelijkheid over de mechanismen van geheugenconsolidatie en -toegang (1 point)."
         }
     ]
 }

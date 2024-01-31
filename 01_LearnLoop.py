@@ -346,6 +346,12 @@ def check_add_to_practice_phase(): #TODO: checken of het werkt en dan connecten 
         st.session_state.practice_questions[st.session_state.selected_module].append(st.session_state.segment_index)
 
 
+def render_student_answer():
+    """Renders the student's answer."""
+    st.write('Your answer')
+    st.write(st.session_state.student_answer)
+
+
 def learning_phase_page():
     """
     Renders the page that takes the student through the concepts of the lecture
@@ -377,6 +383,7 @@ def learning_phase_page():
                 # Spinner that displays during evaluating answer
                 with st.spinner('Evaluating your answer 🔄'):
                     evaluate_answer()
+                render_student_answer()
                 render_feedback()
                 check_add_to_practice_phase()
                 render_explanation()
@@ -502,6 +509,7 @@ def render_start_page():
         with practice_col:
             st.markdown('<p style="font-size: 30px;"><strong>Practice Phase 📝</strong></p>', unsafe_allow_html=True)
             st.write("The **practice phase** is where you can practice the concepts you've learned in the **learning phase**. It uses spaced repetition to reinforce your memory and improve long-term retention.")
+        
         # # Display 'Courses' header
         # st.markdown('<p style="font-size: 60px;"><strong>Courses</strong></p>', unsafe_allow_html=True)
 
