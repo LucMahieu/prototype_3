@@ -564,6 +564,7 @@ def render_sidebar():
     with st.sidebar:
         # Toggle to turn openai request on/off for easier and cheaper testing
         st.checkbox("Currently testing", key="currently_testing")
+        # st.session_state.currently_testing = False #TODO: remove this line with the checkbox when coding
 
         st.sidebar.title("Modules")
 
@@ -600,12 +601,12 @@ if __name__ == "__main__":
         if st.session_state.selected_module is None:
             
             # Column to centre the start button in the middle of the page
-            start_col = st.columns(3)
-            with start_col[0]:
-                st.subheader("Start where you left off")
+            # start_col = st.columns(3)
+            # with start_col[0]:
+            #     st.subheader("Start where you left off")
             
-                # Create button to start learning phase of first module
-                if st.button('Start', key='start', use_container_width=True):
+            #     # Create button to start learning phase of first module
+            #     if st.button('Start', key='start', use_container_width=True):
                     st.session_state.selected_module = st.session_state.modules[0] + ' | learning'
                     
                     # Rerun to make sure the page is displayed directly after start button is clicked
