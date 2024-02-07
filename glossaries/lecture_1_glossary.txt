@@ -1,11 +1,8 @@
 Hippocampus-Cortex Dialoog en Consolidatie
-De hippocampus fungeert als een centrale hub in de hersenen en speelt een cruciale rol bij de consolidatie van nieuwe herinneringen. Na het leren van iets nieuws bevindt de informatie zich voornamelijk in de hippocampus, waar veel plasticiteit en connectiviteit met andere hersendelen aanwezig is. Synapsen ondergaan veranderingen met behulp van neuromodulatoren zoals acetylcholine, wat essentieel is voor het veiligstellen van langetermijngeheugen.
+De hippocampus speelt een cruciale rol in de vorming van nieuwe herinneringen en fungeert als een centrale hub in de hersenen. Na het leren van nieuwe informatie is er een consolidatieproces waarbij de hippocampus de herinnering intact houdt door middel van plasticiteit en synaptische veranderingen. Neuromodulatoren zoals acetylcholine zijn noodzakelijk voor dit proces.
 
-Het Belang van de Hippocampus voor Langtermijngeheugen
-Zonder een functionerende hippocampus, zoals in het geval van Clive Wearing, kan men geen langetermijnherinneringen vasthouden. De cortex alleen is niet in staat om lange termijn herinneringen te vormen die bewust benaderd kunnen worden. De hippocampus is nodig voor het vormen van episodische herinneringen die men zich bewust kan herinneren.
+Geheugenvorming en Langetermijngeheugen
+De hippocampus is essentieel voor het instandhouden van het langetermijngeheugen. Zonder een functionerende hippocampus, zoals in het geval van Clive Waring, kunnen geen nieuwe langetermijnherinneringen worden gevormd. De cortex kan op zichzelf impliciete herinneringen vormen, maar deze vormen geen bewuste episodes.
 
-Impliciete Geheugen en de Cortex
-De cortex is in staat impliciete herinneringen op te slaan, wat inhoudt dat men zich niet bewust is van deze herinneringen en dat ze geen echte episodes vormen. Dit type geheugen is anders dan het expliciete of episodische geheugen dat afhankelijk is van de hippocampus.
-
-De Mysterieuze Rol van de Hippocampus
-Hoewel het duidelijk is dat de hippocampus noodzakelijk is voor het bewust benaderen van geheugen, blijft de exacte reden waarom dit zo is grotendeels onbekend. Het is echter een erkend feit in de neurowetenschap.
+Bewust Geheugen en Impliciet Geheugen
+Het bewust kunnen benaderen van geheugen vereist geheugensporen die via de hippocampus zijn gevormd. De cortex kan impliciete herinneringen vastleggen, maar deze leiden niet tot bewuste herinneringen of episodische herinneringen. Waarom de hippocampus exclusief deze rol vervult, is nog niet volledig begrepen.

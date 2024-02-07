@@ -16,58 +16,44 @@ db_client = database.init_connection(**st.secrets["mongo"])
 db = db_client.LearnLoop
 
 
-def get_progress():
+def fetch_phase_data(phase):
     """
-    Gets the progress of the user from the database in the form of a dictionary
-    that consists of an index and other info relevant to the progress.
+    Fetch the progress data etc. of the user in the current phase from the database,
+    which indicates the relative progress of the user in the current phase.
     """
-    # For convenience, store the selected module name in a variable
-    module = st.session_state.selected_module
-
-    # Get progress object from database
+    # Find users document in the database
     user_doc = db.users.find_one({"username": st.session_state.username})
 
-    if user_doc is not None and "progress" in user_doc and module in user_doc["progress"]:
-        # User found and has a progress field
-        progress = user_doc["progress"][module]
-
-        return progress
+    if user_doc is not None:
+        if user_doc["progress"] is not None:
+            if st.session_state.selected_module in user_doc["progress"]:
+                if st.session_state.selected_phase in user_doc["progress"][st.session_state.selected_module]:
+                    return user_doc["progress"][st.session_state.selected_module][phase]
     else:
-        # User not found or does not have a progress field -> Initialize
-        return {"segment_index": 0, "easy_count": {}}
+        return None
 
 
 def upload_progress():
     """
-    Uploads the progress of the user to the database in the form of indexes for each module
+    Uploads the progress of the user in the current phase to the database.
     """
-
-    # Check if user exists and update
-    if db.users.find_one({"username": st.session_state.username}):
-        # # Easy count dict to string keys only
-        # easy_count = {str(k): v for k, v in easy_count.items()}
-
-        # Add to progress object
-        db.users.update_one(
-            {"username": st.session_state.username},
-            {"$set": {
-                f"progress.{st.session_state.selected_module}": {
-                    "segment_index": st.session_state.segment_index,
-                    "easy_count": st.session_state.easy_count
-                }
-            }}
-        )
-    else:
-        print("User does not exist, not updating progress")
+    db.users.update_one(
+        {"username": st.session_state.username},
+        {"$set": {
+            f"progress.{st.session_state.selected_module}.{st.session_state.selected_phase}": {
+                "segment_index": st.session_state.segment_index
+            }
+        }}
+    )
 
 
-def change_card_index(index: int):
-    """Function to change the index of the current card in the deck."""
-    card_idx = st.session_state.indices.pop(0)
+# def change_card_index(index: int):
+#     """Function to change the index of the current card in the deck."""
+#     card_idx = st.session_state.indices.pop(0)
 
-    if index > -1:
-        # Insert at given index
-        st.session_state.indices.insert(index, card_idx)
+#     if index > -1:
+#         # Insert at given index
+#         st.session_state.indices.insert(index, card_idx)
 
 
 # def evaluate_graduation(current_card):
@@ -121,35 +107,35 @@ def evaluate_answer():
         st.session_state.score = split_response[1]
     else:
         st.session_state.feedback = "O"
-        st.session_state.score = "2/2"
+        st.session_state.score = "0/2"
 
 
-def next_question(difficulty):
-    st.session_state.submitted = False
-    st.session_state.score = ""
-    st.session_state.feedback = ""
-    st.session_state.answer = ""
-    st.session_state.show_answer = False
+# def next_question(difficulty): #TODO: Might be removed because currently not used properly
+#     st.session_state.submitted = False
+#     st.session_state.score = ""
+#     st.session_state.feedback = ""
+#     st.session_state.answer = ""
+#     st.session_state.show_answer = False
 
-    # Check which difficulty level was pressed and sort card deck accordingly
-    if difficulty == 'easy':
-        # Count executive times the user found current card easy
-        # evaluate_graduation(st.session_state.indices[0])
+#     # Check which difficulty level was pressed and sort card deck accordingly
+#     if difficulty == 'easy':
+#         # Count executive times the user found current card easy
+#         # evaluate_graduation(st.session_state.indices[0])
 
-        # Remove card from deck so it won't repeat
-        st.session_state.indices.pop(0)
-    else:
-        reset_easy_count(st.session_state.indices[0])
-        if difficulty == 'medium':
-            change_card_index(5)
-        elif difficulty == 'hard':
-            change_card_index(2)
+#         # Remove card from deck so it won't repeat
+#         st.session_state.indices.pop(0)
+#     else:
+#         reset_easy_count(st.session_state.indices[0])
+#         if difficulty == 'medium':
+#             change_card_index(5)
+#         elif difficulty == 'hard':
+#             change_card_index(2)
 
-    # Save progress to db after next is pressed
-    upload_progress()
+#     # Save progress to db after next is pressed
+#     upload_progress(st.selected_phase)
 
 
-def score_to_percentage(score):
+def score_to_percentage():
     """Converts a score in the form of a string to a percentage."""
     try:
         # Calculate the score percentage
@@ -157,10 +143,10 @@ def score_to_percentage(score):
         if total == '0':
             score_percentage = 0
         else:
-            # If there is a comma, change it to a dot
+            # If there is a comma (e.g. 1,5), change it to a dot
             if ',' in part:
                 part = part.replace(',', '.')
-            score_percentage = float(part) / float(total)
+            score_percentage = int(float(part) / float(total) * 100)
     except Exception as e:
         st.error(f"Error calculating score: {e}")
         return  # Early exit on error
@@ -171,7 +157,7 @@ def score_to_percentage(score):
 def render_feedback():
     """Renders the feedback box with the score and feedback."""
     # Calculate the score percentage
-    score_percentage = score_to_percentage(st.session_state.score)
+    score_percentage = score_to_percentage()
 
     # Determine color of box based on score percentage
     if score_percentage > 0.75:
@@ -240,34 +226,24 @@ def render_SR_buttons():
         st.button('Next', use_container_width=True)
 
 
-# def add_to_practice_phase():
-#     """Adds the current segment to the practice phase and changes the current card index."""
-#     # Save current segment index to JSON file
-#     with open("./progress.json", "w") as f:
-#         json.dump({"module_name": st.session_state.selected_module, "segment_index": st.session_state.segment_index}, f)
-    
-#     # Change current segment index to the next segment
-#     change_segment_index(1)
-
-
-def render_add_to_practice_buttons():
-    col_add, col_yes, col_no = st.columns(3)
-    with col_add:
-        # st.subheader('Add to **Practice Phase** 📝?')
-        st.markdown("""
-            <style>
-            .centered {
-                text-align: center;
-            }
-            </style>
-            <div class="centered">
-                <p style="font-size: 18px;">Add to <strong>Practice Phase</strong> 📝?</p>
-            </div>
-        """, unsafe_allow_html=True)
-    with col_yes:
-        st.button('Yes', use_container_width=True, on_click=add_to_practice_phase)
-    with col_no:
-        st.button('No', use_container_width=True, on_click=change_segment_index, args=(1,))
+# def render_add_to_practice_buttons():
+#     col_add, col_yes, col_no = st.columns(3)
+#     with col_add:
+#         # st.subheader('Add to **Practice Phase** 📝?')
+#         st.markdown("""
+#             <style>
+#             .centered {
+#                 text-align: center;
+#             }
+#             </style>
+#             <div class="centered">
+#                 <p style="font-size: 18px;">Add to <strong>Practice Phase</strong> 📝?</p>
+#             </div>
+#         """, unsafe_allow_html=True)
+#     with col_yes:
+#         st.button('Yes', use_container_width=True, on_click=add_to_practice_phase)
+#     with col_no:
+#         st.button('No', use_container_width=True, on_click=change_segment_index, args=(1,))
 
 
 def render_explanation():
@@ -275,13 +251,13 @@ def render_explanation():
         st.markdown(st.session_state.current_segment['answer'])
 
 
-def change_segment_index(step):
+def change_segment_index(step_direction):
     """Change the segment index based on the direction of step (previous or next)."""
     # Store segments and current segment index in variable for clarity     
     segments = st.session_state.page_content['segments']
 
-    if st.session_state.segment_index + step in range(len(segments)):
-        st.session_state.segment_index += step
+    if st.session_state.segment_index + step_direction in range(len(segments)):
+        st.session_state.segment_index += step_direction
     elif st.session_state.segment_index == len(segments) - 1:
         st.session_state.segment_index = 0
     else:
@@ -338,12 +314,47 @@ def render_question():
     st.subheader(st.session_state.current_segment['question'])
 
 
-def check_add_to_practice_phase(): #TODO: checken of het werkt en dan connecten met practice phase.
-    """Checks if the current segment should be added to the practice phase."""
-    # Determine if the score is below 100% 
-    if score_to_percentage(st.session_state.score) == 100:
-        # Add segment index of questions that student found difficult to dict coupled to module name
-        st.session_state.practice_questions[st.session_state.selected_module].append(st.session_state.segment_index)
+def fetch_practice_segments():
+    """Fetches the practice segments from the database."""
+    user_doc = db.users.find_one({"username": st.session_state.username})
+    practice_segments = user_doc["progress"][st.session_state.selected_module]["practice"]["practice_segments"]
+    return practice_segments
+
+
+def update_practice_segments():
+    """Updates the practice segments in the database."""
+    db.users.update_one(
+        {"username": st.session_state.username},
+        {"$set": {f"progress.{st.session_state.selected_module}.practice.practice_segments": st.session_state.practice_segments}}
+    )
+
+
+def add_to_practice_phase():
+    """Adds the current segment to the practice phase in the database if the score is lower than 100."""
+    # Store session states in variables for clarity
+    segment_index = st.session_state.segment_index
+    
+    if score_to_percentage() < 100:
+        # Fetch user progress from the database
+        user_progress = db.users.find_one({"username": st.session_state.username})["progress"]
+
+        # Check if the selected module exists in the user's progress
+        if st.session_state.selected_module in user_progress:
+
+            # Check if the practice object exists for the selected module
+            if "practice" in user_progress[st.session_state.selected_module] and "practice_segments" in user_progress[st.session_state.selected_module]["practice"]:
+                
+                # Fetch the existing practice segments
+                practice_segments = fetch_practice_segments()
+            else:
+                # If the practice object does not exist, create it
+                st.session_state.practice_segments = []
+                update_practice_segments()
+
+        # Check if the practice segments exists and if not, create it
+        if practice_segments is None or segment_index not in practice_segments:
+            st.session_state.practice_segments.append(segment_index)
+            update_practice_segments()
 
 
 def render_student_answer():
@@ -359,12 +370,13 @@ def learning_phase_page():
     and will get personalized feedback on their answers. Incorrectly answered
     questions are added to the practice phase.
     """
+    phase = 'learning'
     # Fetch user progress in the segments (by index) from the database
-    db_segment_index = get_progress()["segment_index"]
-
-    # Save most recent segment index in session state if it's not already set
-    if db_segment_index != st.session_state.segment_index:
-        st.session_state.segment_index = db_segment_index
+    if fetch_phase_data(phase) is None:
+        st.session_state.segment_index = 0
+    else:
+        st.session_state.segment_index = fetch_phase_data(phase)["segment_index"]
+        
 
     # Select the segment that corresponds to the saved index where the user left off
     st.session_state.current_segment = st.session_state.page_content['segments'][st.session_state.segment_index]
@@ -377,6 +389,7 @@ def learning_phase_page():
         if st.session_state.current_segment['type'] == 'info':
             render_info()
             render_navigation_buttons()
+
         if st.session_state.current_segment['type'] == 'question':
             render_question()
             if st.session_state.submitted:
@@ -385,13 +398,16 @@ def learning_phase_page():
                     evaluate_answer()
                 render_student_answer()
                 render_feedback()
-                check_add_to_practice_phase()
+                add_to_practice_phase()
                 render_explanation()
                 render_navigation_buttons()
                 # render_add_to_practice_buttons()
             else:
                 render_answerbox()
                 render_check_and_nav_buttons()
+        
+        if fetch_phase_data(phase) is not None:
+            st.write(db.users.find_one({"username": st.session_state.username})["progress"][st.session_state.selected_module]["practice"]["practice_segments"])
 
 
     # # Check if the end of the phase is reached and display the message and reset button
@@ -404,6 +420,7 @@ def learning_phase_page():
     #     if st.button('Reset deck'):
     #         # Trigger full rerender of page
     #         st.rerun()
+                
 
 def practice_phase_page():
     """
@@ -412,31 +429,45 @@ def practice_phase_page():
     This phase allows the student to practice the concepts they've learned
     during the learning phase and which they found difficult.
     """
+    db_data = fetch_phase_data(phase="practice")
+    if db_data is None:
+        st.session_state.practice_segments = []
+    else:
+        st.session_state.practice_segments = db_data["practice_segments"]
+
+    st.write(db_data)
+
+
+
+
 
 def select_page_type():
     """
     Determines what type of page to display based on which module the user selected.
     """
     # For convenience, store the selected module name in a variable
-    module_name = st.session_state.selected_module
+    module = st.session_state.selected_module
 
-    # Make module name lowercase and replace spaces and with underscores and cuts off at the first |
-    module_json_name = module_name.split(" |")[0].lower().replace(" ", "_")
+    # Make module name lowercase and replace spaces and with underscores and cuts off at the first
+    module_json_name = module.lower().replace(" ", "_")
 
     # Find the json with content that corresponds to the selected module
     with open(f"./modules/{module_json_name}.json", "r") as f:
         st.session_state.page_content = json.load(f)
     
     # Determine what type of page to display
-    if module_name.endswith('practice'):
-        practice_phase_page()
-    elif module_name.endswith('learning'):
+    if st.session_state.selected_phase == 'learning':
         learning_phase_page()
+    if st.session_state.selected_phase == 'practice':
+        practice_phase_page()
 
 
 
 def initialise_session_states():
     """Initialise the session states."""
+
+    if 'selected_phase' not in st.session_state:
+        st.session_state.selected_phase = None
 
     if 'easy_count' not in st.session_state:
         st.session_state.easy_count = {}
@@ -541,7 +572,7 @@ def render_logo():
         st.image('./images/logo.png', width=100)
 
 
-def determine_modules():
+def determine_modules(): #TODO: change the way the sequence of the modules is determined so it corresponds to the sequence of the course
     """	
     Function to determine which names of modules to display in the sidebar 
     based on the JSON module files.	
@@ -563,26 +594,41 @@ def render_sidebar():
     """
     with st.sidebar:
         # Toggle to turn openai request on/off for easier and cheaper testing
-        st.checkbox("Currently testing", key="currently_testing")
-        # st.session_state.currently_testing = False #TODO: remove this line with the checkbox when coding
+        # st.checkbox("Currently testing", key="currently_testing")
+        st.session_state.currently_testing = True #TODO: remove this line with the checkbox when coding
 
         st.sidebar.title("Modules")
-
-        # Determine the modules to display in the sidebar
-        if st.session_state.modules == []:
-            determine_modules()
 
         # Display the modules in expanders in the sidebar
         for module in st.session_state.modules:
             with st.expander(module):
                 # Display buttons for the two types of phases per module
                 if st.button('Learning Phase 📖', key=module + ' learning'):
-                    st.session_state.selected_module = module + ' | learning'
+                    st.session_state.selected_module = module
+                    st.session_state.selected_phase = 'learning'
                 if st.button('Practice Phase 📝', key=module + ' practice'):
-                    st.session_state.selected_module = module + ' | practice'
+                    st.session_state.selected_module = module
+                    st.session_state.selected_phase = 'practice'
 
         # Display login module at bottom of sidebar after logged in
         login_module()
+
+
+def initialise_database():
+    """
+    Initialise the progress object with the modules and phases in the database.
+    """
+    # Add the modules and phases to the progress object in the database
+    for module in st.session_state.modules:
+        db.users.update_one(
+            {"username": st.session_state.username},
+            {"$set": {
+                f"progress.{module}": {
+                    "learning": {"segment_index": 0},
+                    "practice": {"segment_index": 0, "practice_segments": []}
+                }
+            }}
+        )
 
 
 # MAIN PROGRAM
@@ -593,23 +639,26 @@ if __name__ == "__main__":
     
     initialise_session_states()
     
+    # Determine the modules of the current course
+    if st.session_state.modules == []:
+        determine_modules()
+
+    
+    
     # Check authentication
     if render_start_page():
         render_sidebar()
 
         # Display correct module
-        if st.session_state.selected_module is None:
-            
-            # Column to centre the start button in the middle of the page
-            # start_col = st.columns(3)
-            # with start_col[0]:
-            #     st.subheader("Start where you left off")
-            
-            #     # Create button to start learning phase of first module
-            #     if st.button('Start', key='start', use_container_width=True):
-                    st.session_state.selected_module = st.session_state.modules[0] + ' | learning'
-                    
-                    # Rerun to make sure the page is displayed directly after start button is clicked
-                    st.rerun()
+        if st.session_state.selected_module is None:         
+            # Automatically start the first module if no module is selected           
+            st.session_state.selected_module = st.session_state.modules[0] #TODO: this should start at the module where the student left off instead of the first module
+            st.session_state.selected_phase = 'learning'
+            # Rerun to make sure the page is displayed directly after start button is clicked
+            st.rerun()
         else:
+            # Check if database has been initialised
+            user = db.users.find_one({"username": st.session_state.username})
+            if "progress" not in user:
+                initialise_database()
             select_page_type()
