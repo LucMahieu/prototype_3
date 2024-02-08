@@ -90,8 +90,7 @@ class Module:
         response = self.openai_call(system_message, user_message, model='gpt-4-1106-preview', temp=0.7)
 
         # Export the glossary to a file
-        export_path = "./glossaries/lecture_1_glossary.txt"
-        with open(export_path, "w") as f:
+        with open(self.glossary_path, "w") as f:
             f.write(response)
 
 
@@ -123,9 +122,11 @@ class Module:
 
 
 if __name__ == "__main__":
-    transcript_path = "./study_materials/lecture_1_transcript.txt"
-    glossary_path = "./glossaries/lecture_1_glossary.txt"
-    module_name = "amnesie"
+    # transcript_path = "./study_materials/lecture_1_transcript.txt"
+    # transcript_path = "./study_materials/test_slide_chemie.txt"
+    module_name = "test_slide_transcript_chemie"
+    transcript_path = f"./study_materials/{module_name}.txt"
+    glossary_path = f"./glossaries/{module_name}.txt"
     content_path = f"./modules/{module_name}.json"
 
     new_module = Module(module_name, transcript_path, glossary_path, content_path, batch_size=2)

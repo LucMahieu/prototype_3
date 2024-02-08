@@ -21,22 +21,24 @@ def fetch_phase_data(phase):
     Fetch the progress data etc. of the user in the current phase from the database,
     which indicates the relative progress of the user in the current phase.
     """
-    # Find users document in the database
-    user_doc = db.users.find_one({"username": st.session_state.username})
+    # Store user doc in variable for clarity
+    user_doc = st.session_state.user_doc
 
+    # Find users document in the database
     if user_doc is not None:
         if user_doc["progress"] is not None:
             if st.session_state.selected_module in user_doc["progress"]:
-                if st.session_state.selected_phase in user_doc["progress"][st.session_state.selected_module]:
+                if phase in user_doc["progress"][st.session_state.selected_module]:
                     return user_doc["progress"][st.session_state.selected_module][phase]
     else:
         return None
 
 
-def upload_progress():
+def upload_segment_index():
     """
     Uploads the progress of the user in the current phase to the database.
     """
+    st.write(f"Uploading segment index: {st.session_state.segment_index}")
     db.users.update_one(
         {"username": st.session_state.username},
         {"$set": {
@@ -45,6 +47,9 @@ def upload_progress():
             }
         }}
     )
+
+    # Write the current database fields
+    st.write(fetch_phase_data(st.session_state.selected_phase))
 
 
 # def change_card_index(index: int):
@@ -160,9 +165,9 @@ def render_feedback():
     score_percentage = score_to_percentage()
 
     # Determine color of box based on score percentage
-    if score_percentage > 0.75:
+    if score_percentage > 75:
         color = 'rgba(0, 128, 0, 0.2)'  # Green
-    elif score_percentage > 0.49:
+    elif score_percentage > 49:
         color = 'rgba(255, 165, 0, 0.2)'  # Orange
     else:
         color = 'rgba(255, 0, 0, 0.2)'  # Red
@@ -211,11 +216,13 @@ def render_progress_bar(segments):
     st.progress(progress)
     st.session_state.progress = progress
 
+def next_question(difficulty): #TODO: remove, only here for testing SR nav buttons
+    pass
 
-def render_SR_buttons():
+def render_SR_nav_buttons():
     col_prev, col1, col2, col3, col_next = st.columns([1.8, 3, 3, 3, 1.8])
     with col_prev:
-        st.button('Previous', use_container_width=True)
+        st.button('Previous', use_container_width=True, on_click=lambda: change_segment_index(-1))
     with col1:
         st.button('Ask again ↩️', use_container_width=True, on_click=lambda: next_question('hard'))
     with col2:
@@ -223,7 +230,7 @@ def render_SR_buttons():
     with col3:
         st.button('Got it ✅', use_container_width=True, on_click=lambda: next_question('easy'))
     with col_next:
-        st.button('Next', use_container_width=True)
+        st.button('Next', use_container_width=True, on_click=lambda: change_segment_index(1))
 
 
 # def render_add_to_practice_buttons():
@@ -267,7 +274,7 @@ def change_segment_index(step_direction):
     st.session_state.submitted = False
     
     # Update database with new index
-    upload_progress()
+    upload_segment_index()
 
 
 def render_navigation_buttons():
@@ -316,8 +323,7 @@ def render_question():
 
 def fetch_practice_segments():
     """Fetches the practice segments from the database."""
-    user_doc = db.users.find_one({"username": st.session_state.username})
-    practice_segments = user_doc["progress"][st.session_state.selected_module]["practice"]["practice_segments"]
+    practice_segments = st.session_state.user_doc["progress"][st.session_state.selected_module]["practice"].get("practice_segments", [])
     return practice_segments
 
 
@@ -335,32 +341,45 @@ def add_to_practice_phase():
     segment_index = st.session_state.segment_index
     
     if score_to_percentage() < 100:
-        # Fetch user progress from the database
-        user_progress = db.users.find_one({"username": st.session_state.username})["progress"]
+        # Fetch the practice segments from the database
+        practice_segments = fetch_practice_segments()
 
-        # Check if the selected module exists in the user's progress
-        if st.session_state.selected_module in user_progress:
+        if segment_index not in practice_segments:
+            st.session_state.practice_segments = practice_segments.append(segment_index)
+        
+        # Update the practice segments in the database
+        update_practice_segments()
 
-            # Check if the practice object exists for the selected module
-            if "practice" in user_progress[st.session_state.selected_module] and "practice_segments" in user_progress[st.session_state.selected_module]["practice"]:
+        # # Check if the selected module exists in the user's progress
+        # if st.session_state.selected_module in user_progress:
+
+        #     # Check if the practice object exists for the selected module
+        #     if "practice" in user_progress[st.session_state.selected_module] and "practice_segments" in user_progress[st.session_state.selected_module]["practice"]:
                 
-                # Fetch the existing practice segments
-                practice_segments = fetch_practice_segments()
-            else:
-                # If the practice object does not exist, create it
-                st.session_state.practice_segments = []
-                update_practice_segments()
+        #         # Fetch the existing practice segments
+        #         practice_segments = fetch_practice_segments()
+        #     else:
+        #         # If the practice object does not exist, create it
+        #         st.session_state.practice_segments = []
+        #         update_practice_segments()
+        #         st.write(f"Practice phase data{fetch_phase_data('practice')}")
+        #         # practice_segments = fetch_practice_segments()
 
-        # Check if the practice segments exists and if not, create it
-        if practice_segments is None or segment_index not in practice_segments:
-            st.session_state.practice_segments.append(segment_index)
-            update_practice_segments()
+            # # Check if the practice segments exists and if not, create it
+            # if practice_segments is None or segment_index not in practice_segments:
+            #     st.session_state.practice_segments.append(segment_index)
+            #     update_practice_segments()
 
 
 def render_student_answer():
     """Renders the student's answer."""
-    st.write('Your answer')
+    st.write('Your answer:')
     st.write(st.session_state.student_answer)
+
+
+def fetch_segment_index():
+    """Fetches the segment index from the database."""
+    st.session_state.segment_index  = st.session_state.user_doc["progress"][st.session_state.selected_module][st.session_state.selected_phase]["segment_index"]
 
 
 def learning_phase_page():
@@ -370,6 +389,10 @@ def learning_phase_page():
     and will get personalized feedback on their answers. Incorrectly answered
     questions are added to the practice phase.
     """
+    # fetch_segment_index()
+    # st.write(f"Fetched segment index: {st.session_state.segment_index}")
+    # determine_current_segment()
+
     phase = 'learning'
     # Fetch user progress in the segments (by index) from the database
     if fetch_phase_data(phase) is None:
@@ -401,26 +424,71 @@ def learning_phase_page():
                 add_to_practice_phase()
                 render_explanation()
                 render_navigation_buttons()
-                # render_add_to_practice_buttons()
             else:
                 render_answerbox()
                 render_check_and_nav_buttons()
-        
-        if fetch_phase_data(phase) is not None:
-            st.write(db.users.find_one({"username": st.session_state.username})["progress"][st.session_state.selected_module]["practice"]["practice_segments"])
-
-
-    # # Check if the end of the phase is reached and display the message and reset button
-    # if st.session_state.segment_index + 1 == len(st.session_state.page_content['segments']):
-    #     st.title('Done')
-    #     st.write("You've completed the **learning phase** 📖, well done!")
-    #     st.write("To internalise the concepts, you can use the **practice phase** 📝.")
-    #     st.balloons()
-    #     # Restart button
-    #     if st.button('Reset deck'):
-    #         # Trigger full rerender of page
-    #         st.rerun()
                 
+
+def upload_practice_segment_index():
+    """
+    Uploads the practice segment index to the database.
+    """
+    db.users.update_one(
+        {"username": st.session_state.username},
+        {"$set": {
+            f"progress.{st.session_state.selected_module}.practice.practice_segment_index": st.session_state.practice_segment_index
+        }}
+    )
+
+
+def fetch_practice_segment_index():
+    """
+    Fetches the practice segment index from the database.
+    """
+    practice_segment_index = st.session_state.user_doc["progress"][st.session_state.selected_module]["practice"]["practice_segment_index"]
+    return practice_segment_index
+
+
+def determine_segment_index():
+    """
+    Determines the segment index based on the practice segments and the practice segment index.
+    """
+    # Fetch the practice segments from the database
+    practice_segments = fetch_practice_segments()
+
+    # Fetch the practice segment index from the database
+    practice_segment_index = fetch_practice_segment_index()
+
+    # If the practice segments are not empty, set the segment index to the first segment in the practice segments
+    if practice_segments is not None:
+        if len(practice_segments) > 0:
+            st.session_state.segment_index = practice_segments[practice_segment_index]
+        else:
+            st.session_state.segment_index = 0
+    else:
+        st.session_state.segment_index = 0
+
+
+def determine_current_segment():
+    """Determine the current segment based on the segment index and put in session state."""
+    st.session_state.current_segment = st.session_state.page_content['segments'][st.session_state.segment_index]
+
+
+def initialise_practice_db():
+    """
+    Initialise the practice object in the database.
+    """
+    db.users.update_one(
+        {"username": st.session_state.username},
+        {"$set": {
+            f"progress.{st.session_state.selected_module}.practice": {
+                "segment_index": 0,
+                "practice_segment_index": 0,
+                "practice_segments": []
+            }
+        }}
+    )
+
 
 def practice_phase_page():
     """
@@ -431,14 +499,36 @@ def practice_phase_page():
     """
     db_data = fetch_phase_data(phase="practice")
     if db_data is None:
+        initialise_practice_db()
         st.session_state.practice_segments = []
     else:
         st.session_state.practice_segments = db_data["practice_segments"]
+    
+    determine_segment_index()
+    determine_current_segment()
+    
+    # Display the info or question in the middle column
+    with mid_col:
+        render_progress_bar(st.session_state.page_content['segments'])
 
-    st.write(db_data)
+        # Determine what type of segment to display and render interface accordingly
+        if st.session_state.current_segment['type'] == 'info':
+            render_info()
+            render_navigation_buttons()
 
-
-
+        if st.session_state.current_segment['type'] == 'question':
+            render_question()
+            if st.session_state.submitted:
+                # Spinner that displays during evaluating answer
+                with st.spinner('Evaluating your answer 🔄'):
+                    evaluate_answer()
+                render_student_answer()
+                render_feedback()
+                render_explanation()
+                render_navigation_buttons()
+            else:
+                render_answerbox()
+                render_check_and_nav_buttons()
 
 
 def select_page_type():
@@ -519,8 +609,9 @@ def initialise_session_states():
         st.session_state.difficulty = ""
 
 
-# Function to handle authentication check
 def render_start_page():
+    """Renders the start page with the explanation and login module if not logged in yet."""
+
     if st.session_state["authentication_status"] is False or st.session_state["authentication_status"] is None:
 
         # Display 'How to use' header
@@ -614,10 +705,11 @@ def render_sidebar():
         login_module()
 
 
-def initialise_database():
+def initialise_database_fields():
     """
-    Initialise the progress object with the modules and phases in the database.
+    Initialise all database fields next to username and hashed password.
     """
+    st.write("Initialising database fields")
     # Add the modules and phases to the progress object in the database
     for module in st.session_state.modules:
         db.users.update_one(
@@ -625,10 +717,11 @@ def initialise_database():
             {"$set": {
                 f"progress.{module}": {
                     "learning": {"segment_index": 0},
-                    "practice": {"segment_index": 0, "practice_segments": []}
+                    "practice": {"segment_index": 0, "practice_segments": [], "practice_segment_index": 0}
                 }
             }}
         )
+    # st.write(fetch_phase_data(phase='practice'))
 
 
 # MAIN PROGRAM
@@ -642,8 +735,6 @@ if __name__ == "__main__":
     # Determine the modules of the current course
     if st.session_state.modules == []:
         determine_modules()
-
-    
     
     # Check authentication
     if render_start_page():
@@ -651,14 +742,16 @@ if __name__ == "__main__":
 
         # Display correct module
         if st.session_state.selected_module is None:         
-            # Automatically start the first module if no module is selected           
+            # Automatically start the first module if no module is selected        
             st.session_state.selected_module = st.session_state.modules[0] #TODO: this should start at the module where the student left off instead of the first module
             st.session_state.selected_phase = 'learning'
             # Rerun to make sure the page is displayed directly after start button is clicked
             st.rerun()
         else:
+            # Initialise user document reference in database
+            if 'user_doc' not in st.session_state:
+                st.session_state.user_doc = db.users.find_one({"username": st.session_state.username})
             # Check if database has been initialised
-            user = db.users.find_one({"username": st.session_state.username})
-            if "progress" not in user:
-                initialise_database()
+            if "progress" not in st.session_state.user_doc:
+                initialise_database_fields()
             select_page_type()
