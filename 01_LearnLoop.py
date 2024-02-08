@@ -33,45 +33,23 @@ def fetch_phase_data(phase):
         return None
 
 
-def upload_progress():
+def upload_segment_index():
     """
     Uploads the progress of the user in the current phase to the database.
     """
+    # Store path and data in variables for clarity
+    path = f"progress.{st.session_state.selected_module}.{st.session_state.selected_phase}"
+    data = {f"{path}.segment_index": st.session_state.segment_index}
+
+    # Also upload the ordered_segment_sequence if the practice session if active
+    if st.session_state.selected_phase == 'practice':
+        data[f"{path}.ordered_segment_sequence"] = st.session_state.ordered_segment_sequence
+    
+    # The data dict contains the paths and data
     db.users.update_one(
         {"username": st.session_state.username},
-        {"$set": {
-            f"progress.{st.session_state.selected_module}.{st.session_state.selected_phase}": {
-                "segment_index": st.session_state.segment_index
-            }
-        }}
+        {"$set": data}
     )
-
-
-# def change_card_index(index: int):
-#     """Function to change the index of the current card in the deck."""
-#     card_idx = st.session_state.indices.pop(0)
-
-#     if index > -1:
-#         # Insert at given index
-#         st.session_state.indices.insert(index, card_idx)
-
-
-# def evaluate_graduation(current_card):
-#     if current_card in st.session_state.easy_count:
-#         st.session_state.easy_count[current_card] += 1
-#     else:
-#         st.session_state.easy_count[current_card] = 1
-
-#     # Delete card if graduated
-#     if st.session_state.easy_count[current_card] >= 2:
-#         st.session_state.indices.pop(0) # Remove the index of the graduated card
-#     else:
-#         # Move card to back of deck
-#         change_card_index(20)  # Adjust this value as needed
-        
-
-def reset_easy_count(current_card):
-    st.session_state.easy_count[current_card] = 0
 
 
 def evaluate_answer():
@@ -80,9 +58,9 @@ def evaluate_answer():
         
         # Create user prompt with the question, correct answer and student answer
         prompt = f"""Input:\n
-        Vraag: {st.session_state.current_segment['question']}\n
+        Vraag: {st.session_state.segment_content['question']}\n
         Antwoord student: {st.session_state.student_answer}\n
-        Beoordelingsrubriek: {st.session_state.current_segment['answer']}\n
+        Beoordelingsrubriek: {st.session_state.segment_content['answer']}\n
         Output:\n"""
 
         # Read the role prompt from a file
@@ -108,31 +86,6 @@ def evaluate_answer():
     else:
         st.session_state.feedback = "O"
         st.session_state.score = "0/2"
-
-
-# def next_question(difficulty): #TODO: Might be removed because currently not used properly
-#     st.session_state.submitted = False
-#     st.session_state.score = ""
-#     st.session_state.feedback = ""
-#     st.session_state.answer = ""
-#     st.session_state.show_answer = False
-
-#     # Check which difficulty level was pressed and sort card deck accordingly
-#     if difficulty == 'easy':
-#         # Count executive times the user found current card easy
-#         # evaluate_graduation(st.session_state.indices[0])
-
-#         # Remove card from deck so it won't repeat
-#         st.session_state.indices.pop(0)
-#     else:
-#         reset_easy_count(st.session_state.indices[0])
-#         if difficulty == 'medium':
-#             change_card_index(5)
-#         elif difficulty == 'hard':
-#             change_card_index(2)
-
-#     # Save progress to db after next is pressed
-#     upload_progress(st.selected_phase)
 
 
 def score_to_percentage():
@@ -182,7 +135,7 @@ def render_feedback():
     st.markdown(result_html, unsafe_allow_html=True)
 
 
-def render_progress_bar(segments):
+def render_progress_bar():
     # Change style of progressbar
     progress_bar_style = """
     <style>
@@ -201,9 +154,10 @@ def render_progress_bar(segments):
     """
     st.markdown(progress_bar_style, unsafe_allow_html=True)
 
+    phase_length = determine_phase_length()
     # Initialise progress bar or update progress that indicates the relative segment index
-    if len(segments) > 0:
-        progress = int((st.session_state.segment_index + 1) / len(segments) * 100)
+    if phase_length > 0:
+        progress = int((st.session_state.segment_index + 1) / phase_length * 100)
     else:
         progress = 0
 
@@ -212,10 +166,10 @@ def render_progress_bar(segments):
     st.session_state.progress = progress
 
 
-def render_SR_buttons():
+def render_SR_nav_buttons():
     col_prev, col1, col2, col3, col_next = st.columns([1.8, 3, 3, 3, 1.8])
     with col_prev:
-        st.button('Previous', use_container_width=True)
+        st.button('Previous', use_container_width=True, on_click=lambda: change_segment_index(-1))
     with col1:
         st.button('Ask again ↩️', use_container_width=True, on_click=lambda: next_question('hard'))
     with col2:
@@ -223,31 +177,39 @@ def render_SR_buttons():
     with col3:
         st.button('Got it ✅', use_container_width=True, on_click=lambda: next_question('easy'))
     with col_next:
-        st.button('Next', use_container_width=True)
+        st.button('Next', use_container_width=True, on_click=lambda: change_segment_index(1))
 
 
 def render_explanation():
     with st.expander("Explanation"):
-        st.markdown(st.session_state.current_segment['answer'])
+        st.markdown(st.session_state.segment_content['answer'])
+
+
+def determine_phase_length():
+    if st.session_state.selected_phase == 'practice':
+        return len(st.session_state.ordered_segment_sequence)
+    else:
+        return len(st.session_state.page_content["segments"])
 
 
 def change_segment_index(step_direction):
     """Change the segment index based on the direction of step (previous or next)."""
-    # Store segments and current segment index in variable for clarity     
-    segments = st.session_state.page_content['segments']
+    # Store segments and current segment index in variable for clarity
+    # Determine total length of module
+    phase_length = determine_phase_length()
 
-    if st.session_state.segment_index + step_direction in range(len(segments)):
+    if st.session_state.segment_index + step_direction in range(phase_length):
         st.session_state.segment_index += step_direction
-    elif st.session_state.segment_index == len(segments) - 1:
+    elif st.session_state.segment_index == phase_length - 1:
         st.session_state.segment_index = 0
     else:
-        st.session_state.segment_index = len(segments) - 1
+        st.session_state.segment_index = phase_length - 1
 
     # Prevent evaluating aswer when navigating to the next or previous segment 
     st.session_state.submitted = False
     
     # Update database with new index
-    upload_progress()
+    upload_segment_index()
 
 
 def render_navigation_buttons():
@@ -277,8 +239,8 @@ def render_check_and_nav_buttons():
 
 def render_info():
     """Renders the info segment with title and text."""
-    st.subheader(st.session_state.current_segment['title'])
-    st.write(st.session_state.current_segment['text'])
+    st.subheader(st.session_state.segment_content['title'])
+    st.write(st.session_state.segment_content['text'])
 
 
 def render_answerbox():
@@ -291,21 +253,21 @@ def render_answerbox():
 
 def render_question():
     """Function to render the question and textbox for the students answer."""
-    st.subheader(st.session_state.current_segment['question'])
+    st.subheader(st.session_state.segment_content['question'])
 
 
-def fetch_practice_segments():
+def fetch_ordered_segment_sequence():
     """Fetches the practice segments from the database."""
     user_doc = db.users.find_one({"username": st.session_state.username})
-    fetched_practice_segments = user_doc["progress"][st.session_state.selected_module]["practice"]["practice_segments"]
-    return fetched_practice_segments
+    fetched_ordered_segment_sequence = user_doc["progress"][st.session_state.selected_module]["practice"]["ordered_segment_sequence"]
+    return fetched_ordered_segment_sequence
 
 
-def update_practice_segments(practice_segments):
+def update_ordered_segment_sequence(ordered_segment_sequence):
     """Updates the practice segments in the database."""
     db.users.update_one(
         {"username": st.session_state.username},
-        {"$set": {f"progress.{st.session_state.selected_module}.practice.practice_segments": practice_segments}}
+        {"$set": {f"progress.{st.session_state.selected_module}.practice.ordered_segment_sequence": ordered_segment_sequence}}
     )
 
 
@@ -315,15 +277,15 @@ def add_to_practice_phase():
     segment_index = st.session_state.segment_index
     
     if score_to_percentage() < 100:
-        st.write(f"Fetched practice segments: {fetch_practice_segments()}")
-        practice_segments = fetch_practice_segments()
+        st.write(f"Fetched practice segments: {fetch_ordered_segment_sequence()}")
+        ordered_segment_sequence = fetch_ordered_segment_sequence()
 
-        if segment_index not in practice_segments:
-            practice_segments.append(segment_index)
-            st.write(practice_segments)
+        if segment_index not in ordered_segment_sequence:
+            ordered_segment_sequence.append(segment_index)
+            st.write(f"new index added: {ordered_segment_sequence}")
 
         # Update practice segments in db
-        update_practice_segments(practice_segments)
+        update_ordered_segment_sequence(ordered_segment_sequence)
 
 
 def render_student_answer():
@@ -349,18 +311,18 @@ def learning_phase_page():
     st.session_state.segment_index = fetch_segment_index()
 
     # Select the segment (with contents) that corresponds to the saved index where the user left off
-    st.session_state.current_segment = st.session_state.page_content['segments'][st.session_state.segment_index]
+    st.session_state.segment_content = st.session_state.page_content['segments'][st.session_state.segment_index]
 
     # Display the info or question in the middle column
     with mid_col:
-        render_progress_bar(st.session_state.page_content['segments'])
+        render_progress_bar()
 
         # Determine what type of segment to display and render interface accordingly
-        if st.session_state.current_segment['type'] == 'info':
+        if st.session_state.segment_content['type'] == 'info':
             render_info()
             render_navigation_buttons()
 
-        if st.session_state.current_segment['type'] == 'question':
+        if st.session_state.segment_content['type'] == 'question':
             render_question()
             if st.session_state.submitted:
                 # Spinner that displays during evaluating answer
@@ -376,6 +338,12 @@ def learning_phase_page():
                 render_check_and_nav_buttons()
                
 
+def debug_print_statments(json_index):
+    st.write(f"Fetched segment index: {st.session_state.segment_index}")
+    st.write(f"Ordered sequence: {st.session_state.ordered_segment_sequence}")
+    st.write(f"JSON index: {json_index}")
+
+
 def practice_phase_page():
     """
     Renders the page that contains the practice questions and 
@@ -383,19 +351,30 @@ def practice_phase_page():
     This phase allows the student to practice the concepts they've learned
     during the learning phase and which they found difficult.
     """
-    
+    # Fetch the last segment index from db
+    st.session_state.segment_index = fetch_segment_index()
 
+    # Fetch the ordered_segment_sequence from db
+    st.session_state.ordered_segment_sequence = fetch_ordered_segment_sequence()
+
+    # Use the segment index to lookup the json index in the ordered_segment_sequence
+    json_index = st.session_state.ordered_segment_sequence[st.session_state.segment_index]
+
+    # Select the segment (with contents) that corresponds to the saved json index where the user left off
+    st.session_state.segment_content = st.session_state.page_content['segments'][json_index]
+
+    debug_print_statments(json_index)
 
     # Display the info or question in the middle column
     with mid_col:
-        render_progress_bar(st.session_state.page_content['segments'])
+        render_progress_bar()
 
         # Determine what type of segment to display and render interface accordingly
-        if st.session_state.current_segment['type'] == 'info':
+        if st.session_state.segment_content['type'] == 'info':
             render_info()
             render_navigation_buttons()
 
-        elif st.session_state.current_segment['type'] == 'question':
+        elif st.session_state.segment_content['type'] == 'question':
             render_question()
             if st.session_state.submitted:
                 # Spinner that displays during evaluating answer
@@ -404,7 +383,7 @@ def practice_phase_page():
                 render_student_answer()
                 render_feedback()
                 render_explanation()
-                render_navigation_buttons()
+                render_SR_nav_buttons()
             else:
                 render_answerbox()
                 render_check_and_nav_buttons()
@@ -434,8 +413,11 @@ def select_page_type():
 def initialise_session_states():
     """Initialise the session states."""
 
-    if 'practice_segments' not in st.session_state:
-        st.session_state.practice_segments = []
+    if 'ordered_segment_sequence' not in st.session_state:
+        st.session_state.ordered_segment_sequence = []
+
+    if 'ordered_segment_sequence' not in st.session_state:
+        st.session_state.ordered_segment_sequence = []
 
     if 'selected_phase' not in st.session_state:
         st.session_state.selected_phase = None
@@ -465,8 +447,8 @@ def initialise_session_states():
     if 'segments' not in st.session_state:
         st.session_state.segments = None
     
-    if 'current_segment' not in st.session_state:
-        st.session_state.current_segment = None
+    if 'segment_content' not in st.session_state:
+        st.session_state.segment_content = None
 
     if 'previous_page_name' not in st.session_state:
         st.session_state.previous_page_name = None
@@ -597,8 +579,7 @@ def initialise_database():
                 f"progress.{module}": {
                     "learning": {"segment_index": 0},
                     "practice": {"segment_index": 0,
-                                 "practice_segments": [],
-                                 "practice_segment_index": 0
+                                 "ordered_segment_sequence": [],
                                 }}
             }}
         )
@@ -629,6 +610,12 @@ if __name__ == "__main__":
         else:
             # Check if database has been initialised
             user = db.users.find_one({"username": st.session_state.username})
-            if "progress" not in user:
+            # if "progress" not in user:
+
+            if 'reset_db' not in st.session_state: #TODO: Remove after testing. This resets the db with every relaunch.
+                st.session_state.reset_db = False
+            
+            if st.session_state.reset_db:
                 initialise_database()
+                st.session_state.reset_db = False
             select_page_type()

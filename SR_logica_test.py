@@ -3,7 +3,7 @@ import json
 # Dit is een lijst die je bijhoudt (practice segments)
 ordered_segment_sequence = [1, 3, 5, 1, 6, 8, 13, 5]
 
-# Dit is een variabele die je bijhoudt
+# Dit is een variabele die je bijhoudt en opslaat in de database. Die kun je fetchen.
 segment_index = 3
 
 # Hiermee bepaal je de json waarde die je moet gebruiken om de current_segment te krijgen.
