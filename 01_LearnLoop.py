@@ -33,7 +33,7 @@ def fetch_phase_data(phase):
         return None
 
 
-def upload_segment_index():
+def upload_progress():
     """
     Uploads the progress of the user in the current phase to the database.
     """
@@ -166,16 +166,36 @@ def render_progress_bar():
     st.session_state.progress = progress
 
 
+def re_insert_question(interval):
+    """Copies a question that the user wants to repeat and re-insert it
+    in the list that contains the segment sequence. The interval determines
+    how many other questions it takes for the question to be displayed again."""
+    new_pos = st.session_state.segment_index + interval
+
+    # Make sure the new position fits in the segment sequence list
+    list_length = len(st.session_state.ordered_segment_sequence)
+    if new_pos > list_length:
+        new_pos = list_length
+
+    # Read value of current index that corresponds to the json index
+    json_index = st.session_state.ordered_segment_sequence[st.session_state.segment_index]
+
+    # Insert the segment in new position
+    st.session_state.ordered_segment_sequence.insert(new_pos, json_index)
+
+    change_segment_index(1)    
+
+
 def render_SR_nav_buttons():
     col_prev, col1, col2, col3, col_next = st.columns([1.8, 3, 3, 3, 1.8])
     with col_prev:
         st.button('Previous', use_container_width=True, on_click=lambda: change_segment_index(-1))
     with col1:
-        st.button('Ask again ↩️', use_container_width=True, on_click=lambda: next_question('hard'))
+        st.button('Repeat quickly ↩️', use_container_width=True, on_click=re_insert_question, args=(10,))
     with col2:
-        st.button('Repeat later 🕒', use_container_width=True, on_click=lambda: next_question('medium'))
+        st.button('Repeat later 🕒', use_container_width=True, on_click=re_insert_question, args=(15,))
     with col3:
-        st.button('Got it ✅', use_container_width=True, on_click=lambda: next_question('easy'))
+        st.button('Got it ✅', use_container_width=True, on_click=lambda: change_segment_index(1))
     with col_next:
         st.button('Next', use_container_width=True, on_click=lambda: change_segment_index(1))
 
@@ -209,7 +229,7 @@ def change_segment_index(step_direction):
     st.session_state.submitted = False
     
     # Update database with new index
-    upload_segment_index()
+    upload_progress()
 
 
 def render_navigation_buttons():
@@ -220,9 +240,11 @@ def render_navigation_buttons():
     with next_col:
         st.button("Next", on_click=change_segment_index, args=(1,), use_container_width=True)
 
+
 def set_submitted_true():
     """Whithout this helper function the user will have to press "check" button twice before submitting"""
     st.session_state.submitted = True
+
 
 def render_check_and_nav_buttons():
     """Renders the previous, check and next buttons when a question is displayed."""
@@ -276,12 +298,10 @@ def add_to_practice_phase():
     segment_index = st.session_state.segment_index
     
     if score_to_percentage() < 100:
-        st.write(f"Fetched practice segments: {fetch_ordered_segment_sequence()}")
         ordered_segment_sequence = fetch_ordered_segment_sequence()
 
         if segment_index not in ordered_segment_sequence:
             ordered_segment_sequence.append(segment_index)
-            st.write(f"new index added: {ordered_segment_sequence}")
 
         # Update practice segments in db
         update_ordered_segment_sequence(ordered_segment_sequence)
@@ -612,7 +632,7 @@ def initialise_database():
 if __name__ == "__main__":
     # Create a mid column with margins in which everything one a 
     # page is displayed (referenced to mid_col in functions)
-    left_col, mid_col, right_col = st.columns([2, 6, 2])
+    left_col, mid_col, right_col = st.columns([1, 6, 1])
     
     initialise_session_states()
     
@@ -637,7 +657,7 @@ if __name__ == "__main__":
             # if "progress" not in user:
 
             if 'reset_db' not in st.session_state: #TODO: Remove after testing. This resets the db with every relaunch.
-                st.session_state.reset_db = False
+                st.session_state.reset_db = True
             
             if st.session_state.reset_db:
                 initialise_database()
