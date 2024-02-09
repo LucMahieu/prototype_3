@@ -1,4 +1,3 @@
-import openai
 import streamlit as st
 from dotenv import load_dotenv
 import os
@@ -14,23 +13,6 @@ st.set_page_config(page_title="LearnLoop", layout="wide")
 
 db_client = database.init_connection(**st.secrets["mongo"])
 db = db_client.LearnLoop
-
-
-def fetch_phase_data(phase):
-    """
-    Fetch the progress data etc. of the user in the current phase from the database,
-    which indicates the relative progress of the user in the current phase.
-    """
-    # Find users document in the database
-    user_doc = db.users.find_one({"username": st.session_state.username})
-
-    if user_doc is not None:
-        if user_doc["progress"] is not None:
-            if st.session_state.selected_module in user_doc["progress"]:
-                if st.session_state.selected_phase in user_doc["progress"][st.session_state.selected_module]:
-                    return user_doc["progress"][st.session_state.selected_module][phase]
-    else:
-        return None
 
 
 def upload_progress():
@@ -254,7 +236,6 @@ def render_check_and_nav_buttons():
         st.button('Check', use_container_width=True, on_click=set_submitted_true)
     with col_next_question:
         st.button('Next', use_container_width=True, on_click=change_segment_index, args=(1,))
-    
 
 
 def render_info():
@@ -344,7 +325,6 @@ def initialise_learning_page():
     else:
         # Select the segment (with contents) that corresponds to the saved index where the user left off
         st.session_state.segment_content = st.session_state.page_content['segments'][st.session_state.segment_index]
-
         reset_submitted_if_page_changed()
 
 
@@ -409,11 +389,13 @@ def render_practice_explanation():
 
 
 def initialise_practice_page():
-    """Update all session states with database data."""
+    """Update all session states with database data and render practice explanation 
+    if it's the first time."""
     # Fetch the last segment index from db
     st.session_state.segment_index = fetch_segment_index()
 
     if st.session_state.segment_index == -1:
+        fetch_ordered_segment_sequence()
         render_practice_explanation()
     else:
         fetch_ordered_segment_sequence()
@@ -423,7 +405,6 @@ def initialise_practice_page():
 
         # Select the segment (with contents) that corresponds to the saved json index where the user left off
         st.session_state.segment_content = st.session_state.page_content['segments'][json_index]
-
         reset_submitted_if_page_changed()
 
 
@@ -620,9 +601,10 @@ def render_sidebar():
     Function to render the sidebar with the modules and login module.	
     """
     with st.sidebar:
+        render_logo()
         # Toggle to turn openai request on/off for easier and cheaper testing
         # st.checkbox("Currently testing", key="currently_testing")
-        st.session_state.currently_testing = True #TODO: remove this line with the checkbox when coding
+        st.session_state.currently_testing = False #TODO: remove this line with the checkbox when coding
 
         st.sidebar.title("Modules")
 
