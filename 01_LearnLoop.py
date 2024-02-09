@@ -157,7 +157,7 @@ def render_progress_bar():
     phase_length = determine_phase_length()
     # Initialise progress bar or update progress that indicates the relative segment index
     if phase_length > 0:
-        progress = int((st.session_state.segment_index + 1) / phase_length * 100)
+        progress = int(((st.session_state.segment_index + 1) / phase_length * 100))
     else:
         progress = 0
 
@@ -220,21 +220,21 @@ def render_navigation_buttons():
     with next_col:
         st.button("Next", on_click=change_segment_index, args=(1,), use_container_width=True)
 
+def set_submitted_true():
+    """Whithout this helper function the user will have to press "check" button twice before submitting"""
+    st.write(f"set_submitted_true is called.")
+    st.session_state.submitted = True
 
 def render_check_and_nav_buttons():
     """Renders the previous, check and next buttons when a question is displayed."""
-    
-    # Whithout this helper function the user will have to press "check" twice before submitting
-    def set_submitted_true():
-        st.session_state.submitted = True
-
     col_prev_question, col_check, col_next_question = st.columns([1, 4, 1])
     with col_prev_question:
         st.button('Previous', use_container_width=True, on_click=change_segment_index, args=(-1,))
     with col_check:
-        st.button('Check', use_container_width=True, on_click=set_submitted_true())
+        st.button('Check', use_container_width=True, on_click=set_submitted_true)
     with col_next_question:
         st.button('Next', use_container_width=True, on_click=change_segment_index, args=(1,))
+    
 
 
 def render_info():
@@ -290,7 +290,7 @@ def add_to_practice_phase():
 
 def render_student_answer():
     """Renders the student's answer."""
-    st.write('Your answer')
+    st.write('Your answer:')
     st.write(st.session_state.student_answer)
 
 
@@ -336,6 +336,9 @@ def learning_phase_page():
             else:
                 render_answerbox()
                 render_check_and_nav_buttons()
+
+    st.write(f"segment index: {st.session_state.segment_index}")
+    st.write(f"submitted?: {st.session_state.submitted}")
                
 
 def debug_print_statments(json_index):
@@ -387,6 +390,9 @@ def practice_phase_page():
             else:
                 render_answerbox()
                 render_check_and_nav_buttons()
+
+    st.write(f"segment index: {st.session_state.segment_index}")
+    st.write(f"submitted?: {st.session_state.submitted}")
 
 
 def select_page_type():
@@ -494,6 +500,9 @@ def render_start_page():
             st.markdown('<p style="font-size: 30px;"><strong>Practice Phase 📝</strong></p>', unsafe_allow_html=True)
             st.write("The **practice phase** is where you can practice the concepts you've learned in the **learning phase**. It uses spaced repetition to reinforce your memory and improve long-term retention.")
         
+        st.write(f"segment index: {st.session_state.segment_index}")
+        st.write(f"submitted?: {st.session_state.submitted}")
+
         # # Display 'Courses' header
         # st.markdown('<p style="font-size: 60px;"><strong>Courses</strong></p>', unsafe_allow_html=True)
 
