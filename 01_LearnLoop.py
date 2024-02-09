@@ -639,6 +639,23 @@ def initialise_database():
         )
 
 
+def determine_if_to_initialise_database():
+    """Determine if currently testing and if so, reset db when loading webapp."""
+    # Check if database has been initialised
+    user = db.users.find_one({"username": st.session_state.username})
+
+    if st.session_state.currently_testing:
+        if 'reset_db' not in st.session_state: #TODO: Remove after testing. This resets the db with every relaunch.
+            st.session_state.reset_db = True
+        
+        if st.session_state.reset_db:
+            st.session_state.reset_db = False
+            initialise_database()
+    else:
+        if "progress" not in user:
+            initialise_database()
+
+
 if __name__ == "__main__":
     # Create a mid column with margins in which everything one a 
     # page is displayed (referenced to mid_col in functions)
@@ -662,14 +679,9 @@ if __name__ == "__main__":
             # Rerun to make sure the page is displayed directly after start button is clicked
             st.rerun()
         else:
-            # Check if database has been initialised
-            user = db.users.find_one({"username": st.session_state.username})
-            # if "progress" not in user:
+            # Turn on to reset db every time the webapp is loaded
+            # and to prevent openai calls (reduce cost & time to develop)
+            st.session_state.currently_testing = False
 
-            if 'reset_db' not in st.session_state: #TODO: Remove after testing. This resets the db with every relaunch.
-                st.session_state.reset_db = True
-            
-            if st.session_state.reset_db:
-                initialise_database()
-                st.session_state.reset_db = False
+            determine_if_to_initialise_database()
             select_page_type()
