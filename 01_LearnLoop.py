@@ -214,7 +214,6 @@ def determine_phase_length():
 
 def change_segment_index(step_direction):
     """Change the segment index based on the direction of step (previous or next)."""
-    # Store segments and current segment index in variable for clarity
     # Determine total length of module
     phase_length = determine_phase_length()
 
@@ -280,8 +279,7 @@ def render_question():
 def fetch_ordered_segment_sequence():
     """Fetches the practice segments from the database."""
     user_doc = db.users.find_one({"username": st.session_state.username})
-    fetched_ordered_segment_sequence = user_doc["progress"][st.session_state.selected_module]["practice"]["ordered_segment_sequence"]
-    return fetched_ordered_segment_sequence
+    st.session_state.ordered_segment_sequence = user_doc["progress"][st.session_state.selected_module]["practice"]["ordered_segment_sequence"]
 
 
 def update_ordered_segment_sequence(ordered_segment_sequence):
@@ -294,11 +292,13 @@ def update_ordered_segment_sequence(ordered_segment_sequence):
 
 def add_to_practice_phase():
     """Adds the current segment to the practice phase in the database if the score is lower than 100."""
-    # Store session states in variables for clarity
+    # Store in variable for clarity
     segment_index = st.session_state.segment_index
     
     if score_to_percentage() < 100:
-        ordered_segment_sequence = fetch_ordered_segment_sequence()
+        fetch_ordered_segment_sequence()
+        # Store in variable for clarity
+        ordered_segment_sequence = st.session_state.ordered_segment_sequence
 
         if segment_index not in ordered_segment_sequence:
             ordered_segment_sequence.append(segment_index)
@@ -319,15 +319,33 @@ def fetch_segment_index():
     return user_doc["progress"][st.session_state.selected_module][st.session_state.selected_phase]["segment_index"]
 
 
+def render_start_button():
+    """Start button at the beginning of a phase that the user never started."""
+    st.button("Start", use_container_width=True, on_click=change_segment_index, args=(1,))
+
+
+def render_learning_explanation():
+    """Renders explanation of learning phase if the user hasn't started with
+    the current phase."""
+    with mid_col:
+        st.markdown('<p style="font-size: 30px;"><strong>Learning phase 📖</strong></p>', unsafe_allow_html=True)
+        st.write("The learning phase **guides you through the concepts of a lecture** in an interactive way with **personalized feedback**. Incorrectly answered questions are automatically added to the practice phase.")
+        render_start_button()
+    exit()
+
+
 def initialise_learning_page():
     """Sets all session states to correspond with database."""
     # Fetch the last segment index from db
     st.session_state.segment_index = fetch_segment_index()
 
-    # Select the segment (with contents) that corresponds to the saved index where the user left off
-    st.session_state.segment_content = st.session_state.page_content['segments'][st.session_state.segment_index]
+    if st.session_state.segment_index == -1: # If user never started this phase
+        render_learning_explanation()
+    else:
+        # Select the segment (with contents) that corresponds to the saved index where the user left off
+        st.session_state.segment_content = st.session_state.page_content['segments'][st.session_state.segment_index]
 
-    reset_submitted_if_page_changed()
+        reset_submitted_if_page_changed()
 
 
 def render_learning_page():
@@ -377,21 +395,36 @@ def reset_submitted_if_page_changed():
         st.session_state.old_page = (st.session_state.selected_module, st.session_state.selected_phase)
 
 
+def render_practice_explanation():
+    """Renders the explanation for the practice phase if the user hasn't started
+    this phase in this module."""
+    with mid_col:
+        st.markdown('<p style="font-size: 30px;"><strong>Practice phase 📝</strong></p>', unsafe_allow_html=True)
+        st.write("The practice phase is where you can practice the concepts you've learned in the learning phase. It uses **spaced repetition** to reinforce your memory and **improve retention.**")
+        if st.session_state.ordered_segment_sequence == []:
+            st.info("Nothing here. First walk through the learning phase to collect difficult questions.")
+        else:
+            render_start_button()
+    exit()
+
+
 def initialise_practice_page():
     """Update all session states with database data."""
     # Fetch the last segment index from db
     st.session_state.segment_index = fetch_segment_index()
 
-    # Fetch the ordered_segment_sequence from db
-    st.session_state.ordered_segment_sequence = fetch_ordered_segment_sequence()
+    if st.session_state.segment_index == -1:
+        render_practice_explanation()
+    else:
+        fetch_ordered_segment_sequence()
 
-    # Use the segment index to lookup the json index in the ordered_segment_sequence
-    json_index = st.session_state.ordered_segment_sequence[st.session_state.segment_index]
+        # Use the segment index to lookup the json index in the ordered_segment_sequence
+        json_index = st.session_state.ordered_segment_sequence[st.session_state.segment_index]
 
-    # Select the segment (with contents) that corresponds to the saved json index where the user left off
-    st.session_state.segment_content = st.session_state.page_content['segments'][json_index]
+        # Select the segment (with contents) that corresponds to the saved json index where the user left off
+        st.session_state.segment_content = st.session_state.page_content['segments'][json_index]
 
-    reset_submitted_if_page_changed()
+        reset_submitted_if_page_changed()
 
 
 def render_practice_page():
@@ -534,9 +567,6 @@ def render_start_page():
         with practice_col:
             st.markdown('<p style="font-size: 30px;"><strong>Practice Phase 📝</strong></p>', unsafe_allow_html=True)
             st.write("The **practice phase** is where you can practice the concepts you've learned in the **learning phase**. It uses spaced repetition to reinforce your memory and improve long-term retention.")
-        
-        st.write(f"segment index: {st.session_state.segment_index}")
-        st.write(f"submitted?: {st.session_state.submitted}")
 
         # # Display 'Courses' header
         # st.markdown('<p style="font-size: 60px;"><strong>Courses</strong></p>', unsafe_allow_html=True)
@@ -607,7 +637,6 @@ def render_sidebar():
                     st.session_state.selected_module = module
                     st.session_state.selected_phase = 'practice'
 
-        # Display login module at bottom of sidebar after logged in
         login_module()
 
 
@@ -615,14 +644,13 @@ def initialise_database():
     """
     Initialise the progress object with the modules and phases in the database.
     """
-    # Add the modules and phases to the progress object in the database
     for module in st.session_state.modules:
         db.users.update_one(
             {"username": st.session_state.username},
             {"$set": {
                 f"progress.{module}": {
-                    "learning": {"segment_index": 0},
-                    "practice": {"segment_index": 0,
+                    "learning": {"segment_index": -1}, # Set to -1 so an explanation displays when phase is first opened
+                    "practice": {"segment_index": -1,
                                  "ordered_segment_sequence": [],
                                 }}
             }}
