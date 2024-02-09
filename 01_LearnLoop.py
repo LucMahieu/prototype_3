@@ -222,7 +222,6 @@ def render_navigation_buttons():
 
 def set_submitted_true():
     """Whithout this helper function the user will have to press "check" button twice before submitting"""
-    st.write(f"set_submitted_true is called.")
     st.session_state.submitted = True
 
 def render_check_and_nav_buttons():
@@ -300,18 +299,25 @@ def fetch_segment_index():
     return user_doc["progress"][st.session_state.selected_module][st.session_state.selected_phase]["segment_index"]
 
 
-def learning_phase_page():
+def initialise_learning_page():
+    """Sets all session states to correspond with database."""
+    # Fetch the last segment index from db
+    st.session_state.segment_index = fetch_segment_index()
+
+    # Select the segment (with contents) that corresponds to the saved index where the user left off
+    st.session_state.segment_content = st.session_state.page_content['segments'][st.session_state.segment_index]
+
+    reset_submitted_if_page_changed()
+
+
+def render_learning_page():
     """
     Renders the page that takes the student through the concepts of the lecture
     with info segments and questions. The student can navigate between segments
     and will get personalized feedback on their answers. Incorrectly answered
     questions are added to the practice phase.
     """
-    # Fetch the last segment index from db
-    st.session_state.segment_index = fetch_segment_index()
-
-    # Select the segment (with contents) that corresponds to the saved index where the user left off
-    st.session_state.segment_content = st.session_state.page_content['segments'][st.session_state.segment_index]
+    initialise_learning_page()
 
     # Display the info or question in the middle column
     with mid_col:
@@ -335,25 +341,24 @@ def learning_phase_page():
                 render_navigation_buttons()
             else:
                 render_answerbox()
+                if st.session_state.student_answer:
+                    set_submitted_true()
+                    st.rerun()
                 render_check_and_nav_buttons()
 
-    st.write(f"segment index: {st.session_state.segment_index}")
-    st.write(f"submitted?: {st.session_state.submitted}")
-               
 
-def debug_print_statments(json_index):
-    st.write(f"Fetched segment index: {st.session_state.segment_index}")
-    st.write(f"Ordered sequence: {st.session_state.ordered_segment_sequence}")
-    st.write(f"JSON index: {json_index}")
+def reset_submitted_if_page_changed():
+    """Checks if the page changed and if so, resets submitted to false in 
+    order to prevent the question from being evaluated directly when opening
+    a page that starts with a question."""
+    st.session_state.current_page = (st.session_state.selected_module, st.session_state.selected_phase)
+    if st.session_state.old_page != st.session_state.current_page:
+        st.session_state.submitted = False
+        st.session_state.old_page = (st.session_state.selected_module, st.session_state.selected_phase)
 
 
-def practice_phase_page():
-    """
-    Renders the page that contains the practice questions and 
-    answers without the info segments and with the spaced repetition buttons.
-    This phase allows the student to practice the concepts they've learned
-    during the learning phase and which they found difficult.
-    """
+def initialise_practice_page():
+    """Update all session states with database data."""
     # Fetch the last segment index from db
     st.session_state.segment_index = fetch_segment_index()
 
@@ -366,7 +371,17 @@ def practice_phase_page():
     # Select the segment (with contents) that corresponds to the saved json index where the user left off
     st.session_state.segment_content = st.session_state.page_content['segments'][json_index]
 
-    debug_print_statments(json_index)
+    reset_submitted_if_page_changed()
+
+
+def render_practice_page():
+    """
+    Renders the page that contains the practice questions and 
+    answers without the info segments and with the spaced repetition buttons.
+    This phase allows the student to practice the concepts they've learned
+    during the learning phase and which they found difficult.
+    """
+    initialise_practice_page()
 
     # Display the info or question in the middle column
     with mid_col:
@@ -389,10 +404,11 @@ def practice_phase_page():
                 render_SR_nav_buttons()
             else:
                 render_answerbox()
+                 # Becomes True if user presses ctrl + enter to evaluate answer (instead of pressing "check")
+                if st.session_state.student_answer:
+                    set_submitted_true()
+                    st.rerun()
                 render_check_and_nav_buttons()
-
-    st.write(f"segment index: {st.session_state.segment_index}")
-    st.write(f"submitted?: {st.session_state.submitted}")
 
 
 def select_page_type():
@@ -411,13 +427,19 @@ def select_page_type():
 
     # Determine what type of page to display
     if st.session_state.selected_phase == 'learning':
-        learning_phase_page()
+        render_learning_page()
     if st.session_state.selected_phase == 'practice':
-        practice_phase_page()
+        render_practice_page()
 
 
 def initialise_session_states():
     """Initialise the session states."""
+
+    if 'old_page' not in st.session_state:
+        st.session_state.old_page = None
+
+    if 'current_page' not in st.session_state:
+        st.session_state.current_page = None
 
     if 'ordered_segment_sequence' not in st.session_state:
         st.session_state.ordered_segment_sequence = []
@@ -437,7 +459,6 @@ def initialise_session_states():
     if 'indices' not in st.session_state:
         st.session_state.indices = []
 
-    # Index of current segment (question or info) that user sees
     if 'segment_index' not in st.session_state:
         st.session_state.segment_index = 0
 
@@ -455,12 +476,6 @@ def initialise_session_states():
     
     if 'segment_content' not in st.session_state:
         st.session_state.segment_content = None
-
-    if 'previous_page_name' not in st.session_state:
-        st.session_state.previous_page_name = None
-
-    if 'current_page_name' not in st.session_state:
-        st.session_state.current_page_name = __file__
 
     if 'submitted' not in st.session_state:
         st.session_state.submitted = False
