@@ -5,11 +5,13 @@ import database
 import json
 from login import login_module
 from openai import OpenAI
-client = OpenAI()
-
-load_dotenv()
 
 st.set_page_config(page_title="LearnLoop", layout="wide")
+
+
+load_dotenv()
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+client = OpenAI()
 
 db_client = database.init_connection(**st.secrets["mongo"])
 db = db_client.LearnLoop
@@ -95,9 +97,9 @@ def render_feedback():
     score_percentage = score_to_percentage()
 
     # Determine color of box based on score percentage
-    if score_percentage > 0.75:
+    if score_percentage > 70:
         color = 'rgba(0, 128, 0, 0.2)'  # Green
-    elif score_percentage > 0.49:
+    elif score_percentage > 49:
         color = 'rgba(255, 165, 0, 0.2)'  # Orange
     else:
         color = 'rgba(255, 0, 0, 0.2)'  # Red
@@ -641,19 +643,25 @@ def initialise_database():
 
 def determine_if_to_initialise_database():
     """Determine if currently testing and if so, reset db when loading webapp."""
-    # Check if database has been initialised
     user = db.users.find_one({"username": st.session_state.username})
 
     if st.session_state.currently_testing:
-        if 'reset_db' not in st.session_state: #TODO: Remove after testing. This resets the db with every relaunch.
+        if 'reset_db' not in st.session_state:
             st.session_state.reset_db = True
         
         if st.session_state.reset_db:
             st.session_state.reset_db = False
             initialise_database()
-    else:
-        if "progress" not in user:
+            return
+            
+    if "progress" not in user:
             initialise_database()
+            return
+    
+    for module in st.session_state.modules:
+        if module not in user["progress"]:
+            initialise_database()
+            return
 
 
 if __name__ == "__main__":
