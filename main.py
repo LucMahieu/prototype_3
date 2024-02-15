@@ -97,7 +97,7 @@ def render_feedback():
     score_percentage = score_to_percentage()
 
     # Determine color of box based on score percentage
-    if score_percentage > 75:
+    if score_percentage > 70:
         color = 'rgba(0, 128, 0, 0.2)'  # Green
     elif score_percentage > 49:
         color = 'rgba(255, 165, 0, 0.2)'  # Orange
@@ -105,12 +105,12 @@ def render_feedback():
         color = 'rgba(255, 0, 0, 0.2)'  # Red
 
     # Feedback with bullet points and bold scores
-    feedback_items = [f"<li style='font-size: 17px; margin: 15px 0;'>{line}</li>" for line in st.session_state.feedback if line.strip()]
+    feedback_items = [f"<ul style='font-size: 18px; margin: 15px 0;'>{line}</ul>" for line in st.session_state.feedback if line.strip()]
     feedback_html = f"<ul style='padding-left: 20px;'>{''.join(feedback_items)}</ul>"
 
     result_html = f"""
     <div style='background-color: {color}; padding: 25px; margin-bottom: 15px; border-radius: 8px;'>
-        <h1 style='font-size: 40px; margin: 10px;'>{st.session_state.score}</h1>
+        <h1 style='font-size: 34px; margin: 10px;'>{st.session_state.score}</h1>
         {feedback_html}
     </div>
     """
